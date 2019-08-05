@@ -1,7 +1,7 @@
 # Личный проект «Большое путешествие» [![Build status][travis-image]][travis-url]
 
 * Студент: [Анастасия Шишова](https://up.htmlacademy.ru/ecmascript/9/user/808931).
-* Наставник: `Неизвестно`.
+* Наставник: [Артем Черкасов](https://up.htmlacademy.ru/ecmascript/9/user/530727).
 
 ---
 

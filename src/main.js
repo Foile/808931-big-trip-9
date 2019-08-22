@@ -14,7 +14,7 @@ const render = (container, template, position = `beforeend`) =>{
 };
 
 
-const events = [getEvent(), getEvent(), getEvent(), getEvent()]
+const events = Array(4).fill().map(()=> getEvent())
   .sort((event1, event2)=> event1.timeStart - event2.timeStart);
 
 events[0].edit = true;

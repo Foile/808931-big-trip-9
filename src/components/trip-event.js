@@ -1,18 +1,18 @@
 const calcDuration = (timeStart, timeEnd) =>{
-  let d = Math.abs(timeEnd - timeStart) / 1000;
-  let r = {};
-  let s = {
+  let diff = Math.abs(timeEnd - timeStart) / 1000;
+  let result = {};
+  let partTime = {
     day: 86400,
     hour: 3600,
     minute: 60
   };
 
-  Object.keys(s).forEach((key) => {
-    r[key] = Math.floor(d / s[key]);
-    d -= r[key] * s[key];
+  Object.keys(partTime).forEach((key) => {
+    result[key] = Math.floor(diff / partTime[key]);
+    diff -= result[key] * partTime[key];
   });
 
-  return Object.keys(r).map((cur) => r[cur] > 0 ? `${r[cur]}${cur[0].toUpperCase()}` : ``).join(` `);
+  return Object.keys(result).map((cur) => result[cur] > 0 ? `${result[cur]}${cur[0].toUpperCase()}` : ``).join(` `);
 };
 
 export const tripEventItem = ({type, destination, timeStart, timeEnd, price, offers}) => `<li class="trip-events__item">

@@ -12,9 +12,9 @@ const eventTitles = [
 ];
 
 export const eventTypeGroups = eventTitles.reduce(
-    (groups, eventData) =>
+    (groups, [name, type]) =>
       Object.assign(groups, {
-        [eventData[1]]: groups[eventData[1]] ? [...groups[eventData[1]], eventData[0]] : [eventData[0]]
+        [type]: groups[type] ? [...groups[type], name] : [name]
       }),
     {}
 );
@@ -48,6 +48,10 @@ export const destinations = [
   {name: `London`, description: `London is the capital of Great Britain`},
   {name: `Praha`, description: `Prague is one of the most beautiful cities in Europe in terms of its setting on both banks of the Vltava River, its townscape of burgher houses and palaces punctuated by towers, and its individual buildings.`},
 ];
+
+destinations.map((destination) => {
+  destination.photo = Array(Math.floor(Math.random() * 10)).fill().map(()=> `http://picsum.photos/300/150?r=${Math.random()}`);
+});
 
 
 const getArrayRandom = (array, maxCount) => {

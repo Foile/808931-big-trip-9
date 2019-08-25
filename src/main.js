@@ -1,31 +1,25 @@
-import {menu} from './components/menu';
-import {filtersTemplate} from './components/filters';
-import {tripEventEditForm} from './components/trip-event-edit-form';
-import {tripInfo} from './components/trip-info';
-import {tripDayItem} from './components/trip-day';
-import {tripDayList} from './components/trip-day-list';
-import {tripEventList} from './components/trip-event-list';
-import {tripEventItem} from './components/trip-event';
+import {Menu} from './components/menu';
+import {Filters} from './components/filters';
+import {EventEdit} from './components/trip-event-edit-form';
+import {TripInfo} from './components/trip-info';
+import {TripDay} from './components/trip-day';
+import {TripDayList} from './components/trip-day-list';
+import {EventList} from './components/trip-event-list';
+import {Event} from './components/trip-event';
 import {getEvent, getFilters} from './data';
-
-
-const render = (container, template, position = `beforeend`) =>{
-  container.insertAdjacentHTML(position, template);
-};
-
+import {render, Position} from './utils';
 
 const events = Array(4).fill().map(()=> getEvent())
   .sort((event1, event2)=> event1.timeStart - event2.timeStart);
 
-events[0].edit = true;
-
 const tripInfoElement = document.querySelector(`.trip-main__trip-controls`);
 
+render(tripInfoElement, new Menu([{name: `Table`, link: `#`, active: true}, {name: `Stats`, link: `#`}]).getElement());
 
-render(tripInfoElement, menu([{name: `Table`, link: `#`, active: true}, {name: `Stats`, link: `#`}]));
+const tripInfo = document.querySelector(`.trip-main__trip-info`);
+render(tripInfo, new TripInfo(events).getElement(), Position.AFTERBEGIN);
 
 const tripInfoCostElement = document.querySelector(`.trip-info__cost`);
-render(tripInfoCostElement, tripInfo(events), `beforebegin`);
 
 let totalAmount = 0;
 events.map(((event)=>{
@@ -34,26 +28,59 @@ events.map(((event)=>{
     totalAmount += offer.price;
   });
 }));
+
 tripInfoCostElement.querySelector(`.trip-info__cost-value`).textContent = totalAmount;
 
 const tripEventsElement = document.querySelector(`.trip-events`);
-render(tripEventsElement, tripDayList());
+render(tripEventsElement, new TripDayList().getElement());
 
 const tripDaysElement = document.querySelector(`.trip-days`);
 
 const days = new Set(events.map(({timeStart})=>(new Date(timeStart)).setHours(0, 0, 0, 0)));
 
 Array.from(days).forEach((day, index) => {
-  render(tripDaysElement, tripDayItem(index + 1, day));
+  let dayElement = new TripDay(day, index + 1).getElement();
+  render(tripDaysElement, dayElement);
 
-  const tripDay = tripDaysElement.querySelector(`#day-${index + 1}`);
-  render(tripDay, tripEventList());
+  const eventsList = new EventList().getElement();
+  render(dayElement, eventsList);
 
-  const eventsListItem = tripDay.querySelector(`.trip-events__list`);
+  events.filter(({timeStart}) => new Date(day).toLocaleDateString() === new Date(timeStart).toLocaleDateString()).forEach((event)=> {
+    let eventComponent = new Event(event);
+    let eventEditComponent = new EventEdit(event);
 
-  events.filter(({timeStart}) => new Date(day).toLocaleDateString() === new Date(timeStart).toLocaleDateString()).forEach((event)=>
-    render(eventsListItem, event.edit ? tripEventEditForm(event) : tripEventItem(event)));
+    const onEscKeyDown = (evt) => {
+      if (evt.key === `Escape` || evt.key === `Esc`) {
+        eventsList.replaceChild(eventComponent.getElement(), eventEditComponent.getElement());
+        document.removeEventListener(`keydown`, onEscKeyDown);
+      }
+    };
+
+    eventComponent.getElement()
+      .querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, () => {
+        eventsList.replaceChild(eventEditComponent.getElement(), eventComponent.getElement());
+        document.addEventListener(`keydown`, onEscKeyDown);
+      });
+
+    eventEditComponent.getElement()
+      .querySelector(`.event__rollup-btn`)
+      .addEventListener(`click`, () => {
+        eventsList.replaceChild(eventComponent.getElement(), eventEditComponent.getElement());
+        document.addEventListener(`keydown`, onEscKeyDown);
+      });
+
+    eventEditComponent.getElement()
+      .querySelector(`.event__save-btn`)
+      .addEventListener(`click`, () => {
+        eventsList.replaceChild(eventComponent.getElement(), eventEditComponent.getElement());
+        document.removeEventListener(`keydown`, onEscKeyDown);
+      });
+
+
+    render(eventsList, eventComponent.getElement());
+  });
 });
 
 const tripControlsElement = document.querySelector(`.trip-main__trip-controls`);
-render(tripControlsElement, filtersTemplate(getFilters(events)));
+render(tripControlsElement, new Filters(getFilters(events)).getElement());

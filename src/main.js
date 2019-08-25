@@ -70,16 +70,6 @@ Array.from(days).forEach((day, index) => {
         document.addEventListener(`keydown`, onEscKeyDown);
       });
 
-    /* eventEditComponent.getElement().querySelector(`textarea`)
-      .addEventListener(`focus`, () => {
-        document.removeEventListener(`keydown`, onEscKeyDown);
-      });
-
-    eventEditComponent.getElement().querySelector(`textarea`)
-      .addEventListener(`blur`, () => {
-        document.addEventListener(`keydown`, onEscKeyDown);
-      });
-*/
     eventEditComponent.getElement()
       .querySelector(`.event__save-btn`)
       .addEventListener(`click`, () => {
@@ -88,7 +78,7 @@ Array.from(days).forEach((day, index) => {
       });
 
 
-    render(eventsList, event.edit ? eventEditComponent.getElement() : eventComponent.getElement());
+    render(eventsList, eventComponent.getElement());
   });
 });
 

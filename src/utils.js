@@ -1,7 +1,6 @@
 export const Position = {
   AFTERBEGIN: `afterbegin`,
-  BEFOREEND: `beforeend`,
-  BEFOREBEGIN: `beforebegin`
+  BEFOREEND: `beforeend`
 };
 
 export const createElement = (template) => {
@@ -19,8 +18,6 @@ export const render = (container, element, place = Position.BEFOREEND) => {
     case Position.BEFOREEND:
       container.append(element);
       break;
-    case Position.BEFOREBEGIN:
-      container.parentNode.append(element);
   }
 };
 

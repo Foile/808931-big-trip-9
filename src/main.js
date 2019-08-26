@@ -4,12 +4,14 @@ import {EventEdit} from './components/trip-event-edit-form';
 import {TripInfo} from './components/trip-info';
 import {TripDay} from './components/trip-day';
 import {TripDayList} from './components/trip-day-list';
-import {EventList} from './components/trip-event-list';
+import {EventList, EmptyEventList} from './components/trip-event-list';
 import {Event} from './components/trip-event';
 import {getEvent, getFilters} from './data';
 import {render, Position} from './utils';
 
-const events = Array(4).fill().map(()=> getEvent())
+const EVENT_COUNT = 0;
+
+const events = Array(EVENT_COUNT).fill().map(()=> getEvent())
   .sort((event1, event2)=> event1.timeStart - event2.timeStart);
 
 const tripInfoElement = document.querySelector(`.trip-main__trip-controls`);
@@ -32,9 +34,8 @@ events.map(((event)=>{
 tripInfoCostElement.querySelector(`.trip-info__cost-value`).textContent = totalAmount;
 
 const tripEventsElement = document.querySelector(`.trip-events`);
-render(tripEventsElement, new TripDayList().getElement());
-
-const tripDaysElement = document.querySelector(`.trip-days`);
+const tripDaysElement = events.length > 0 ? new TripDayList().getElement() : new EmptyEventList().getElement();
+render(tripEventsElement, tripDaysElement);
 
 const days = new Set(events.map(({timeStart})=>(new Date(timeStart)).setHours(0, 0, 0, 0)));
 

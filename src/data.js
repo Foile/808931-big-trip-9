@@ -69,8 +69,8 @@ export const getEvent = () => {
   return {
     type: eventType[Math.floor(Math.random() * eventType.length)],
     destination: destinations[Math.floor(Math.random() * destinations.length)],
-    timeStart: Date.now() + 1 + Math.ceil(Math.random() * 1000) * 24 * 60 * 60,
-    timeEnd: Date.now() + 1 + Math.ceil(Math.random() * 7 * 1000) * 24 * 60 * 60,
+    timeStart: Date.now() + 1 + Math.ceil(Math.random() * 3600) * 1000 * 24 * 7,
+    timeEnd: Date.now() + 1 + Math.ceil(Math.random() * 3600) * 1000 * 24 * 7,
     price: Math.floor(Math.random() * 100 + 1),
     offers: getArrayRandom(offer, 2),
   };

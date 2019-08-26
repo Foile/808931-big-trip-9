@@ -1,8 +1,6 @@
 import {Menu} from './components/menu';
 import {Filters} from './components/filters';
 import {TripInfo} from './components/trip-info';
-import {TripDayList} from './components/trip-day-list';
-import {EmptyEventList} from './components/trip-event-list';
 import {getEvent, getFilters} from './data';
 import {render, Position} from './utils';
 import {TripController} from './components/trip-controller';

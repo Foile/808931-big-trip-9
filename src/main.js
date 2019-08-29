@@ -4,6 +4,7 @@ import {TripInfo} from './components/trip-info';
 import {getEvent, getFilters} from './data';
 import {render, Position} from './utils';
 import {TripController} from './components/trip-controller';
+import {Sort} from './components/sort';
 
 const EVENT_COUNT = 6;
 
@@ -30,7 +31,7 @@ events.map(((event)=>{
 tripInfoCostElement.querySelector(`.trip-info__cost-value`).textContent = totalAmount;
 
 const tripEventsElement = document.querySelector(`.trip-events`);
-
+render(tripEventsElement, new Sort().getElement());
 
 new TripController(events, tripEventsElement).init();
 

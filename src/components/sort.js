@@ -1,4 +1,4 @@
-import {AbstractComponent} from './abstract-component';
+import { AbstractComponent } from './abstract-component';
 
 export class Sort extends AbstractComponent {
   getTemplate() {
@@ -17,8 +17,8 @@ export class Sort extends AbstractComponent {
         </svg>
       </label>
     </div>
-    <div class="trip-sort__item  trip-sort__item--price">
-      <input id="sort-price" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-price">
+    <div class="trip-sort__item  trip-sort__item--price" data-sort-type="price">
+      <input id="sort-price" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="sort-price" data-sort-type="price">
       <label class="trip-sort__btn" for="sort-price" data-sort-type="price">
         Price
         <svg class="trip-sort__direction-icon" width="8" height="10" viewBox="0 0 8 10">

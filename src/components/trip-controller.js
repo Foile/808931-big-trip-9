@@ -65,10 +65,14 @@ export class TripController {
   }
 
   _renderSortedEvents(sorting) {
-    const tripDaysElement = this._events.length > 0 ? this._days.getElement() : new EmptyEventList().getElement();
-    render(this._container, tripDaysElement);
+    this._days.getElement().innerHTML = ``;
+    const tripDays = this._events.length > 0 ? new TripDayList() : new EmptyEventList()
+    render(this._container, tripDays.getElement());
+    this._days = tripDays;
+    const tripDay = new TripDay();
+    render(tripDays.getElement(), tripDay.getElement());
     const eventContainer = new EventList();
-    render(tripDaysElement, eventContainer.getElement());
+    render(tripDay.getElement(), eventContainer.getElement());
     this._events = this._events.slice().sort(sorting);
     this._events.forEach((event) => {
       this._renderEvent(eventContainer.getElement(), event);
@@ -76,12 +80,14 @@ export class TripController {
   }
 
   _renderDayEvents() {
-    const tripDaysElement = this._events.length > 0 ? this._days.getElement() : new EmptyEventList().getElement();
-    render(this._container, tripDaysElement);
+    this._days.getElement().innerHTML = ``;
+    const tripDays = this._events.length > 0 ? new TripDayList() : new EmptyEventList();
+    render(this._container, tripDays.getElement());
+    this._days = tripDays;
     const days = new Set(this._events.map(({ timeStart }) => (new Date(timeStart)).setHours(0, 0, 0, 0)));
     Array.from(days).forEach((day, index) => {
       let dayElement = new TripDay(day, index + 1).getElement();
-      render(tripDaysElement, dayElement);
+      render(tripDays.getElement(), dayElement);
       const eventContainer = new EventList();
       render(dayElement, eventContainer.getElement());
       this._events.filter(({ timeStart }) => new Date(day).toLocaleDateString() === new Date(timeStart).toLocaleDateString())

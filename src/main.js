@@ -1,9 +1,9 @@
-import { Menu } from './components/menu';
-import { Filters } from './components/filters';
-import { TripInfo } from './components/trip-info';
-import { getEvent, getFilters } from './data';
-import { render, Position } from './utils';
-import { TripController } from './components/trip-controller';
+import {Menu} from './components/menu';
+import {Filters} from './components/filters';
+import {TripInfo} from './components/trip-info';
+import {getEvent, getFilters} from './data';
+import {render, Position} from './utils';
+import {TripController} from './components/trip-controller';
 
 const EVENT_COUNT = 6;
 
@@ -12,7 +12,7 @@ const events = Array(EVENT_COUNT).fill().map(() => getEvent())
 
 const tripInfoElement = document.querySelector(`.trip-main__trip-controls`);
 
-render(tripInfoElement, new Menu([{ name: `Table`, link: `#`, active: true }, { name: `Stats`, link: `#` }]).getElement());
+render(tripInfoElement, new Menu([{name: `Table`, link: `#`, active: true}, {name: `Stats`, link: `#`}]).getElement());
 
 const tripInfo = document.querySelector(`.trip-main__trip-info`);
 render(tripInfo, new TripInfo(events).getElement(), Position.AFTERBEGIN);

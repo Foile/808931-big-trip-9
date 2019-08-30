@@ -1,10 +1,10 @@
-import { EventList, EmptyEventList } from './trip-event-list';
-import { Event } from './trip-event';
-import { TripDay } from './trip-day';
-import { EventEdit } from './trip-event-edit-form';
-import { render } from '../utils';
-import { TripDayList } from './trip-day-list';
-import { Sort } from './sort';
+import {EventList, EmptyEventList} from './trip-event-list';
+import {Event} from './trip-event';
+import {TripDay} from './trip-day';
+import {EventEdit} from './trip-event-edit-form';
+import {render} from '../utils';
+import {TripDayList} from './trip-day-list';
+import {Sort} from './sort';
 
 export class TripController {
   constructor(events, container) {
@@ -66,7 +66,7 @@ export class TripController {
 
   _renderSortedEvents(sorting) {
     this._days.getElement().innerHTML = ``;
-    const tripDays = this._events.length > 0 ? new TripDayList() : new EmptyEventList()
+    const tripDays = this._events.length > 0 ? new TripDayList() : new EmptyEventList();
     render(this._container, tripDays.getElement());
     this._days = tripDays;
     const tripDay = new TripDay();
@@ -84,13 +84,13 @@ export class TripController {
     const tripDays = this._events.length > 0 ? new TripDayList() : new EmptyEventList();
     render(this._container, tripDays.getElement());
     this._days = tripDays;
-    const days = new Set(this._events.map(({ timeStart }) => (new Date(timeStart)).setHours(0, 0, 0, 0)));
+    const days = new Set(this._events.map(({timeStart}) => (new Date(timeStart)).setHours(0, 0, 0, 0)));
     Array.from(days).forEach((day, index) => {
       let dayElement = new TripDay(day, index + 1).getElement();
       render(tripDays.getElement(), dayElement);
       const eventContainer = new EventList();
       render(dayElement, eventContainer.getElement());
-      this._events.filter(({ timeStart }) => new Date(day).toLocaleDateString() === new Date(timeStart).toLocaleDateString())
+      this._events.filter(({timeStart}) => new Date(day).toLocaleDateString() === new Date(timeStart).toLocaleDateString())
         .forEach((event) => {
           this._renderEvent(eventContainer.getElement(), event);
         });

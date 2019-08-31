@@ -30,7 +30,7 @@ export class EventEdit extends Event {
           ${this._type.title[0].toUpperCase()}${this._type.title.slice(1)} ${this._type.type === `activity` ? `in` : `to`}
         </label>
         <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._destination.name}" list="destination-list-1">
-        <datalist id="destination-list-1">${destinations.map(({name})=>`<option value="${name}"></option>`).join(``)}
+        <datalist id="destination-list-1">${destinations.map(({name}) => `<option value="${name}"></option>`).join(``)}
         </datalist>
       </div>
       <div class="event__field-group  event__field-group--time">
@@ -68,9 +68,9 @@ export class EventEdit extends Event {
       <section class="event__section  event__section--offers">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
         <div class="event__available-offers">
-        ${offer.map(({name, title, price: offerPrice})=>`<div class="event__offer-selector">
+        ${offer.map(({name, title, price: offerPrice}) => `<div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1"
-        type="checkbox" name="event-offer-${name}" ${this._offers.find((off)=> off.name === name) ? `checked=""` : ``}>
+        type="checkbox" name="event-offer-${name}" ${this._offers.find((off) => off.name === name) ? `checked=""` : ``}>
         <label class="event__offer-label" for="event-offer-${name}-1">
           <span class="event__offer-title">${title}</span>+
           €&nbsp;<span class="event__offer-price">${offerPrice}</span>
@@ -83,7 +83,7 @@ export class EventEdit extends Event {
         <p class="event__destination-description">${this._destination.description}</p>
         <div class="event__photos-container">
           <div class="event__photos-tape">
-          ${this._destination.photo.map((photo)=>`<img class="event__photo" src="${photo}" alt="Event photo">`).join(``)}
+          ${this._destination.photo.map((photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``)}
           </div>
         </div>
       </section>

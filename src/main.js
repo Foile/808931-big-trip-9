@@ -7,8 +7,8 @@ import {TripController} from './components/trip-controller';
 
 const EVENT_COUNT = 6;
 
-const events = Array(EVENT_COUNT).fill().map(()=> getEvent())
-  .sort((event1, event2)=> event1.timeStart - event2.timeStart);
+const events = Array(EVENT_COUNT).fill().map(() => getEvent())
+  .sort((event1, event2) => event1.timeStart - event2.timeStart);
 
 const tripInfoElement = document.querySelector(`.trip-main__trip-controls`);
 
@@ -20,7 +20,7 @@ render(tripInfo, new TripInfo(events).getElement(), Position.AFTERBEGIN);
 const tripInfoCostElement = document.querySelector(`.trip-info__cost`);
 
 let totalAmount = 0;
-events.map(((event)=>{
+events.map(((event) => {
   totalAmount += event.price;
   event.offers.map((offer) => {
     totalAmount += offer.price;
@@ -31,8 +31,6 @@ tripInfoCostElement.querySelector(`.trip-info__cost-value`).textContent = totalA
 
 const tripEventsElement = document.querySelector(`.trip-events`);
 
-
 new TripController(events, tripEventsElement).init();
-
 const tripControlsElement = document.querySelector(`.trip-main__trip-controls`);
 render(tripControlsElement, new Filters(getFilters(events)).getElement());

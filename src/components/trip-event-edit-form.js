@@ -2,6 +2,7 @@ import {offer, destinations, eventTypeGroups} from '../data';
 
 import {Event} from './trip-event';
 
+const makeFirstSymUp = (string) => `${string[0].toUpperCase()}${string.slice(1)}`;
 export class EventEdit extends Event {
   getTemplate() {
     return `<li class="trip-events__item">
@@ -27,7 +28,7 @@ export class EventEdit extends Event {
       </div>
       <div class="event__field-group  event__field-group--destination">
         <label class="event__label  event__type-output" for="event-destination-1">
-          ${this._type.title[0].toUpperCase()}${this._type.title.slice(1)} ${this._type.type === `activity` ? `in` : `to`}
+          ${makeFirstSymUp(this._type.title)} ${this._type.type === `activity` ? `in` : `to`}
         </label>
         <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${this._destination.name}" list="destination-list-1">
         <datalist id="destination-list-1">${destinations.map(({name}) => `<option value="${name}"></option>`).join(``)}
@@ -90,5 +91,77 @@ export class EventEdit extends Event {
     </section>
     </form>
     </li>`;
+  }
+  resetForm() {
+    this.getElement().querySelector(`.event--edit`).reset();
+    this.getElement().querySelector(`.event__type-icon`).src = `img/icons/${this._type.title}.png`;
+    this.getElement().querySelector(`.event__type-output`).textContent = `${makeFirstSymUp(this._type.title)} ${this._type.type}`;
+    this.getElement().querySelector(`.event__destination-description`).textContent = `${this._description}`;
+    this.getElement().querySelector(`.event__favorite-checkbox`).checked = this._isFavorite;
+
+    if (this._offers.length > 0) {
+      this.getElement().querySelector(`.event__section--offers`).classList.remove(`visually-hidden`);
+      this.getElement().querySelector(`.event__available-offers`).innerHTML = ``;
+      this.getElement().querySelector(`.event__available-offers`).insertAdjacentHTML(`beforeend`, `${this._offers.map(({name, id, price, isChecked}) => `<div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="${id}-1" type="checkbox" name="${id}" ${isChecked ? `checked` : ``}>
+        <label class="event__offer-label" for="${id}-1">
+          <span class="event__offer-title">${name}</span>
+          &plus;
+          &euro;&nbsp;<span class="event__offer-price">${price}</span>
+        </label>
+      </div>`).join(``)}`);
+    } else if (!this.getElement().querySelector(`.event__section--offers`).classList.contains(`visually-hidden`)) {
+      this.getElement().querySelector(`.event__section--offers`).classList.add(`visually-hidden`);
+    }
+  }
+
+  _setCurrentTypeChecked() {
+    Array.from(this.getElement().querySelectorAll(`input[name="event-type"]`)).find((eventType) => eventType.title === this._type.title).checked = true;
+  }
+
+  _changeOptionsByType() {
+    this.getElement()
+      .querySelectorAll(`.event__type-input`)
+      .forEach((typeItem) => {
+        typeItem.addEventListener(`click`, (evt) => {
+          const target = evt.currentTarget;
+          const typeData = this._tripTypes.find(({type}) => type.title === target.title);
+
+          if (typeData.options.length === 0) {
+            this.getElement().querySelector(`.event__section--offers`).classList.add(`visually-hidden`);
+          } else {
+            this.getElement().querySelector(`.event__section--offers`).classList.remove(`visually-hidden`);
+          }
+
+          this.getElement().querySelector(`.event__type-icon`).src = `img/icons/${typeData.type.title}.png`;
+          this.getElement().querySelector(`.event__type-output`).textContent = `${makeFirstSymUp(typeData.type.title)} ${typeData.type.placeholder}`;
+          this.getElement().querySelector(`.event__type-toggle`).checked = false;
+
+          this.getElement().querySelector(`.event__available-offers`).innerHTML = ``;
+          this.getElement().querySelector(`.event__available-offers`).insertAdjacentHTML(`beforeend`,
+              `${typeData.options.map(({name, id, price, isChecked}) => `<div class="event__offer-selector">
+                <input class="event__offer-checkbox  visually-hidden" id="${id}-1" type="checkbox" name="${id}" ${isChecked ? `checked` : ``}>
+                <label class="event__offer-label" for="${id}-1">
+                  <span class="event__offer-title">${name}</span>
+                  &plus;
+                  &euro;&nbsp;<span class="event__offer-price">${price}</span>
+                </label>
+              </div>`).join(``)}`);
+        });
+      });
+  }
+  _changeDescByCity() {
+    this.getElement()
+      .querySelector(`.event__input--destination`)
+      .addEventListener(`change`, (evt) => {
+        const target = evt.currentTarget;
+        const cityData = destinations.find(({city}) => city === target.value);
+        console.log(cityData);
+        if (cityData) {
+          this.getElement().querySelector(`.event__destination-description`).textContent = cityData.description;
+        } else {
+          this.getElement().querySelector(`.event__destination-description`).textContent = ``;
+        }
+      });
   }
 }

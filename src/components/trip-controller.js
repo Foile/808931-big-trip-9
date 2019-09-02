@@ -1,10 +1,9 @@
 import {EventList, EmptyEventList} from './trip-event-list';
-import {Event} from './trip-event';
 import {TripDay} from './trip-day';
-import {EventEdit} from './trip-event-edit-form';
 import {render} from '../utils';
 import {TripDayList} from './trip-day-list';
 import {Sort} from './sort';
+import {PointController} from './point-controller';
 
 export class TripController {
   constructor(events, container) {
@@ -13,6 +12,7 @@ export class TripController {
     this._container = container;
     this._sort = new Sort();
     this._days = new TripDayList();
+    this._points = [];
   }
 
   _onSortLinkClick(evt) {
@@ -36,32 +36,6 @@ export class TripController {
         this._renderDayEvents();
         break;
     }
-    //
-  }
-
-  _renderEvent(container, event) {
-    let eventComponent = new Event(event);
-    let eventEditComponent = new EventEdit(event);
-    const activateView = () => {
-      container.replaceChild(eventComponent.getElement(), eventEditComponent.getElement());
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    };
-    const activateEdit = () => {
-      container.replaceChild(eventEditComponent.getElement(), eventComponent.getElement());
-      document.addEventListener(`keydown`, onEscKeyDown);
-    };
-    const onEscKeyDown = (evt) => {
-      if (evt.key === `Escape` || evt.key === `Esc`) {
-        activateView();
-      }
-    };
-    eventComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => activateEdit());
-    eventEditComponent.getElement().querySelector(`.event__save-btn`).addEventListener(`click`, () => activateView());
-    eventEditComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
-      activateView();
-      document.addEventListener(`keydown`, onEscKeyDown);
-    });
-    render(container, eventComponent.getElement());
   }
 
   _renderSortedEvents(sorting) {
@@ -75,7 +49,8 @@ export class TripController {
     render(tripDay.getElement(), eventContainer.getElement());
     this._events = this._events.slice().sort(sorting);
     this._events.forEach((event) => {
-      this._renderEvent(eventContainer.getElement(), event);
+      const point = new PointController(event, eventContainer, this.onDataChange, this.onChangeView);
+      this._points.push(point);
     });
   }
 
@@ -92,7 +67,8 @@ export class TripController {
       render(dayElement, eventContainer.getElement());
       this._events.filter(({timeStart}) => new Date(day).toLocaleDateString() === new Date(timeStart).toLocaleDateString())
         .forEach((event) => {
-          this._renderEvent(eventContainer.getElement(), event);
+          const point = new PointController(event, eventContainer, this.onDataChange, this.onChangeView);
+          this._points.push(point);
         });
     });
   }
@@ -102,4 +78,10 @@ export class TripController {
     this._renderDayEvents(this._events);
     this._sort.getElement().addEventListener(`click`, (evt) => this._onSortLinkClick(evt));
   }
+
+  onDataChange(oldData, newData) {
+    this._events[this._events.findIndex((event) => event === oldData)] = newData;
+    this._renderDayEvents(this._events);
+  }
+  onChangeView() {}
 }

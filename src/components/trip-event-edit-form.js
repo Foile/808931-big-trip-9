@@ -1,9 +1,13 @@
-import {offer, destinations, eventTypeGroups} from '../data';
+import {destinations, eventTypeGroups} from '../data';
 
 import {Event} from './trip-event';
 
 const makeFirstSymUp = (string) => `${string[0].toUpperCase()}${string.slice(1)}`;
 export class EventEdit extends Event {
+  constructor(event, offersStack) {
+    super(event);
+    this._offersStack = offersStack;
+  }
   getTemplate() {
     return `<li class="trip-events__item">
     <form class="event  event--edit" action="#" method="post">
@@ -50,7 +54,12 @@ export class EventEdit extends Event {
           <span class="visually-hidden">Price</span>
           €
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${this._price}">
+        <input
+          class="event__input event__input--price"
+          id="event-price-1"
+          type="text"
+          name="event-price"
+          value="${this._price}">
       </div>
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
       <button class="event__reset-btn" type="reset">Delete</button>
@@ -69,9 +78,9 @@ export class EventEdit extends Event {
       <section class="event__section  event__section--offers">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
         <div class="event__available-offers">
-        ${offer.map(({name, title, price: offerPrice}) => `<div class="event__offer-selector">
+        ${this._offersStack.map(({name, title, price: offerPrice}) => `<div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1"
-        type="checkbox" name="event-offer-${name}" ${this._offers.find((off) => off.name === name) ? `checked=""` : ``}>
+        type="checkbox" name="event-offer-${name}" ${this._offers.find((offerChecked) => offerChecked.name === name) ? `checked=""` : ``}>
         <label class="event__offer-label" for="event-offer-${name}-1">
           <span class="event__offer-title">${title}</span>+
           €&nbsp;<span class="event__offer-price">${offerPrice}</span>
@@ -156,7 +165,6 @@ export class EventEdit extends Event {
       .addEventListener(`change`, (evt) => {
         const target = evt.currentTarget;
         const cityData = destinations.find(({city}) => city === target.value);
-        console.log(cityData);
         if (cityData) {
           this.getElement().querySelector(`.event__destination-description`).textContent = cityData.description;
         } else {

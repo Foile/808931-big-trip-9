@@ -32,7 +32,7 @@ export const eventType = [
   {title: `restaurant`, type: `activity`}
 ];
 
-export const offer = [
+export const offers = [
   {title: `Add luggage`, name: `luggage`, price: 30},
   {title: `Switch to comfort class`, name: `comfort`, price: 100},
   {title: `Add meal`, name: `meal`, price: 15},
@@ -50,7 +50,7 @@ export const destinations = [
 ];
 
 destinations.map((destination) => {
-  destination.photo = Array(Math.floor(Math.random() * 10)).fill().map(()=> `http://picsum.photos/300/150?r=${Math.random()}`);
+  destination.photo = Array(Math.floor(Math.random() * 10)).fill().map(() => `http://picsum.photos/300/150?r=${Math.random()}`);
 });
 
 
@@ -72,7 +72,7 @@ export const getEvent = () => {
     timeStart: Date.now() + 1 + Math.ceil(Math.random() * 3600) * 1000 * 24 * 7,
     timeEnd: Date.now() + 1 + Math.ceil(Math.random() * 3600) * 1000 * 24 * 7,
     price: Math.floor(Math.random() * 100 + 1),
-    offers: getArrayRandom(offer, 2),
+    offers: getArrayRandom(offers, 2),
   };
 };
 

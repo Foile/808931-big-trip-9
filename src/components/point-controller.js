@@ -1,6 +1,7 @@
 import {render} from '../utils';
 import {Event} from './trip-event';
 import {EventEdit} from './trip-event-edit-form';
+import {offers as offersStack} from '../data';
 
 export class PointController {
   constructor(event, container, onDataChange, onChangeView) {
@@ -9,7 +10,7 @@ export class PointController {
     this._onDataChange = onDataChange;
     this._onChangeView = onChangeView;
     this._eventComponent = new Event(event);
-    this._eventEditComponent = new EventEdit(event);
+    this._eventEditComponent = new EventEdit(event, offersStack);
 
     this.init();
   }
@@ -30,20 +31,18 @@ export class PointController {
     };
     this._eventComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => activateEdit());
     this._eventEditComponent.getElement().querySelector(`.event--edit`).addEventListener(`submit`, (evt) => {
-      console.log(evt);
       evt.preventDefault();
       const formData = new FormData(this._eventEditComponent.getElement().querySelector(`.event--edit`));
 
       const entry = {
-        type: formData.get(`event-type-toggle`),
+        type: formData.get(`event-type`),
         destination: formData.get(`event-destination`),
         timeStart: new Date(formData.get(`event-start-time`)),
         timeEnd: new Date(formData.get(`event-end-time`)),
         price: formData.get(`event-price`),
-        offers: formData.getAll(`event-offer`)
-      };
+        offers: offersStack.reduce(((res, offer) => formData.get(`event-offer-${offer.name}`) === `on` ? [...res, offer] : [...res]), []),
 
-      console.log(entry);
+      };
 
       this._onDataChange(this._event, entry);
       activateView();

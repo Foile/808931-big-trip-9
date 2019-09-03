@@ -13,6 +13,8 @@ export class TripController {
     this._sort = new Sort();
     this._days = new TripDayList();
     this._points = [];
+    this._onDataChange = this._onDataChange.bind(this);
+    this._onChangeView = this._onChangeView.bind(this);
   }
 
   _onSortLinkClick(evt) {
@@ -49,8 +51,8 @@ export class TripController {
     render(tripDay.getElement(), eventContainer.getElement());
     this._events = this._events.slice().sort(sorting);
     this._events.forEach((event) => {
-      const point = new PointController(event, eventContainer, this.onDataChange, this.onChangeView);
-      this._points.push(point);
+      const point = new PointController(event, eventContainer, this._onDataChange, this._onChangeView);
+      this._points.push(point._activateView.bind(point));
     });
   }
 
@@ -67,8 +69,8 @@ export class TripController {
       render(dayElement, eventContainer.getElement());
       this._events.filter(({timeStart}) => new Date(day).toLocaleDateString() === new Date(timeStart).toLocaleDateString())
         .forEach((event) => {
-          const point = new PointController(event, eventContainer, this.onDataChange, this.onChangeView);
-          this._points.push(point);
+          const point = new PointController(event, eventContainer, this._onDataChange, this._onChangeView);
+          this._points.push(point._activateView.bind(point));
         });
     });
   }
@@ -79,9 +81,12 @@ export class TripController {
     this._sort.getElement().addEventListener(`click`, (evt) => this._onSortLinkClick(evt));
   }
 
-  onDataChange(oldData, newData) {
+  _onDataChange(oldData, newData) {
     this._events[this._events.findIndex((event) => event === oldData)] = newData;
     this._renderDayEvents(this._events);
   }
-  onChangeView() {}
+
+  _onChangeView() {
+    this._points.forEach((it) => it());
+  }
 }

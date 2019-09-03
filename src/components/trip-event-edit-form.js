@@ -1,8 +1,7 @@
-import {destinations, eventTypeGroups} from '../data';
-
+import {destinations, eventTypeGroups, eventTypes} from '../data';
+import {makeFirstSymUp} from '../utils';
 import {Event} from './trip-event';
 
-const makeFirstSymUp = (string) => `${string[0].toUpperCase()}${string.slice(1)}`;
 export class EventEdit extends Event {
   constructor(event, offersStack) {
     super(event);
@@ -17,7 +16,7 @@ export class EventEdit extends Event {
           <span class="visually-hidden">Choose event type</span>
           <img class="event__type-icon" width="17" height="17" src="img/icons/${this._type.title}.png" alt="Event type icon">
         </label>
-        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" name="event-type-toggle" value=${this._type.title}>
         <div class="event__type-list">
         ${Object.keys(eventTypeGroups).map((group) => `
     <fieldset class="event__type-group">
@@ -134,7 +133,7 @@ export class EventEdit extends Event {
       .forEach((typeItem) => {
         typeItem.addEventListener(`click`, (evt) => {
           const target = evt.currentTarget;
-          const typeData = this._tripTypes.find(({type}) => type.title === target.title);
+          const typeData = eventTypes.find(({type}) => type.title === target.title);
 
           if (typeData.options.length === 0) {
             this.getElement().querySelector(`.event__section--offers`).classList.add(`visually-hidden`);

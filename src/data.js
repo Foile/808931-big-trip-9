@@ -19,7 +19,7 @@ export const eventTypeGroups = eventTitles.reduce(
     {}
 );
 
-export const eventType = [
+export const eventTypes = [
   {title: `flight`, type: `transfer`},
   {title: `train`, type: `transfer`},
   {title: `ship`, type: `transfer`},
@@ -67,7 +67,7 @@ const getArrayRandom = (array, maxCount) => {
 
 export const getEvent = () => {
   return {
-    type: eventType[Math.floor(Math.random() * eventType.length)],
+    type: eventTypes[Math.floor(Math.random() * eventTypes.length)],
     destination: destinations[Math.floor(Math.random() * destinations.length)],
     timeStart: Date.now() + 1 + Math.ceil(Math.random() * 3600) * 1000 * 24 * 7,
     timeEnd: Date.now() + 1 + Math.ceil(Math.random() * 3600) * 1000 * 24 * 7,

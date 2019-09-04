@@ -16,11 +16,6 @@ export class TripController {
     this._onChangeView = this._onChangeView.bind(this);
   }
 
-  _setEvents(events) {
-    this._events = events;
-    this._renderEvents();
-  }
-
   _onSortLinkClick(evt) {
     if (evt.target.tagName[0] !== `L`) {
       return;
@@ -29,6 +24,7 @@ export class TripController {
     evt.target.form.querySelector(`#sort-${evt.target.dataset.sortType}`).checked = true;
 
     this._container.innerHTML = ``;
+    this._sort.getElement().querySelector(`.trip-sort__item--day`).innerHTML = ``;
     render(this._container, this._sort.getElement());
     switch (evt.target.dataset.sortType) {
       case `time`:
@@ -39,6 +35,7 @@ export class TripController {
         break;
       default:
         this._renderDayEvents();
+        this._sort.getElement().querySelector(`.trip-sort__item--day`).innerHTML = `Day`;
         break;
     }
   }

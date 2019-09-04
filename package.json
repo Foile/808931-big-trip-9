@@ -20,6 +20,7 @@
     "node": "10"
   },
   "dependencies": {
+    "moment": "^2.24.0",
     "npm": "^6.11.3"
   }
 }

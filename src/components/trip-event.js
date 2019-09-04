@@ -1,6 +1,7 @@
 
 import {AbstractComponent} from './abstract-component';
-import {makeFirstSymUp, calcDuration} from '../utils';
+import {makeFirstSymUp, calcDuration, DATE_FORMAT, TIME_FORMAT} from '../utils';
+import moment from 'moment';
 
 export class Event extends AbstractComponent {
   constructor({type, destination, timeStart, timeEnd, price, offers, isFavorite}) {
@@ -22,9 +23,9 @@ export class Event extends AbstractComponent {
     <h3 class="event__title">${makeFirstSymUp(this._type.title)} ${this._type.type === `activity` ? `in` : `to`} ${this._destination.name}</h3>
     <div class="event__schedule">
       <p class="event__time">
-        <time class="event__start-time" datetime="${new Date(this._timeStart).toDateString()}">${new Date(this._timeStart).toLocaleTimeString()}</time>
+        <time class="event__start-time" datetime="${moment(this._timeStart).format(DATE_FORMAT)}">${moment(this._timeStart).format(TIME_FORMAT)}</time>
         &mdash;
-        <time class="event__end-time" datetime="${new Date(this._timeEnd).toDateString()}">${new Date(this._timeEnd).toLocaleTimeString()}</time>
+        <time class="event__end-time" datetime="${moment(this._timeEnd).format(DATE_FORMAT)}">${moment(this._timeEnd).format(TIME_FORMAT)}</time>
       </p>
       <p class="event__duration">${calcDuration(this._timeStart, this._timeEnd)}</p>
     </div>

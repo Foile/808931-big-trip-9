@@ -1,7 +1,7 @@
 import {destinations, eventTypeGroups, eventTypes} from '../data';
-import {makeFirstSymUp} from '../utils';
+import {makeFirstSymUp, DATE_FORMAT, TIME_FORMAT} from '../utils';
 import {Event} from './trip-event';
-// import moment from 'moment';
+import moment from 'moment';
 
 export class EventEdit extends Event {
   constructor(event, offersStack) {
@@ -19,7 +19,7 @@ export class EventEdit extends Event {
           <span class="visually-hidden">Choose event type</span>
           <img class="event__type-icon" width="17" height="17" src="img/icons/${this._type.title}.png" alt="Event type icon">
         </label>
-        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" name="event-type-toggle" value=${this._type.title}>
+        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
         <div class="event__type-list">
         ${Object.keys(eventTypeGroups).map((group) => `
     <fieldset class="event__type-group">
@@ -44,12 +44,12 @@ export class EventEdit extends Event {
         <label class="visually-hidden" for="event-start-time-1">
           From
         </label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${new Date(this._timeStart).toLocaleDateString()}">
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${moment(this._timeStart).format(`${DATE_FORMAT} ${TIME_FORMAT}`)}">
         —
         <label class="visually-hidden" for="event-end-time-1">
           To
         </label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${new Date(this._timeEnd).toLocaleDateString()}">
+        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${moment(this._timeEnd).format(`DD.MM.YYYY HH:mm`)}">
       </div>
       <div class="event__field-group  event__field-group--price">
         <label class="event__label" for="event-price-1">

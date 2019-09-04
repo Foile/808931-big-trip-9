@@ -2,6 +2,7 @@ import {render} from '../utils';
 import {Event} from './trip-event';
 import {EventEdit} from './trip-event-edit-form';
 import {offers as offersStack, destinations, eventTypes} from '../data';
+import moment from 'moment';
 
 export class PointController {
   constructor(event, container, onDataChange, onChangeView) {
@@ -47,8 +48,8 @@ export class PointController {
       const entry = {
         type: selectedEventType ? selectedEventType : this._event.type,
         destination: destination ? destination : {name: formData.get(`event-destination`), description: ``, photo: []},
-        timeStart: formData.get(`event-start-time`),
-        timeEnd: formData.get(`event-end-time`),
+        timeStart: moment(formData.get(`event-start-time`), `DD.MM.YYYY HH:mm`),
+        timeEnd: moment(formData.get(`event-end-time`), `DD.MM.YYYY HH:mm`),
         price: formData.get(`event-price`),
         offers: offersStack.reduce(((res, offer) => formData.get(`event-offer-${offer.name}`) === `on` ? [...res, offer] : [...res]), []),
         isFavorite: formData.get(`event-favorite`) === `on`,

@@ -16,29 +16,36 @@ export class PointController {
   }
 
   _activateView() {
-    this._container.getElement().replaceChild(this._eventComponent.getElement(), this._eventEditComponent.getElement());
+    if (this._container.getElement().contains(this._eventEditComponent.getElement())) {
+      this._container.getElement().replaceChild(this._eventComponent.getElement(), this._eventEditComponent.getElement());
+    }
   }
 
   _renderEvent() {
     const activateEdit = () => {
-      this._container.getElement().replaceChild(this._eventEditComponent.getElement(), this._eventComponent.getElement());
-      document.addEventListener(`keydown`, onEscKeyDown);
+      this._onChangeView();
+      if (this._container.getElement().contains(this._eventComponent.getElement())) {
+        this._container.getElement().replaceChild(this._eventEditComponent.getElement(), this._eventComponent.getElement());
+        document.addEventListener(`keydown`, onEscKeyDown);
+      }
     };
+
     const onEscKeyDown = (evt) => {
       if (evt.key === `Escape` || evt.key === `Esc`) {
         this._activateView();
         document.removeEventListener(`keydown`, onEscKeyDown);
       }
     };
+
     this._eventComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => activateEdit());
     this._eventEditComponent.getElement().querySelector(`.event--edit`).addEventListener(`submit`, (evt) => {
       evt.preventDefault();
       const formData = new FormData(this._eventEditComponent.getElement().querySelector(`.event--edit`));
       const selectedEventType = eventTypes.find(({title}) => title === formData.get(`event-type`));
-
+      const destination = destinations.find(({name}) => name === formData.get(`event-destination`));
       const entry = {
         type: selectedEventType ? selectedEventType : this._event.type,
-        destination: destinations.find(({name}) => name === formData.get(`event-destination`)),
+        destination: destination ? destination : {name: formData.get(`event-destination`), description: ``, photo: []},
         timeStart: formData.get(`event-start-time`),
         timeEnd: formData.get(`event-end-time`),
         price: formData.get(`event-price`),

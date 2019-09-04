@@ -12,7 +12,7 @@ export class TripController {
     this._container = container;
     this._sort = new Sort();
     this._days = new TripDayList();
-    this._points = [];
+    this._views = [];
     this._onDataChange = this._onDataChange.bind(this);
     this._onChangeView = this._onChangeView.bind(this);
   }
@@ -52,7 +52,7 @@ export class TripController {
     this._events = this._events.slice().sort(sorting);
     this._events.forEach((event) => {
       const point = new PointController(event, eventContainer, this._onDataChange, this._onChangeView);
-      this._points.push(point._activateView.bind(point));
+      this._views.push(point._activateView.bind(point));
     });
   }
 
@@ -70,7 +70,7 @@ export class TripController {
       this._events.filter(({timeStart}) => new Date(day).toLocaleDateString() === new Date(timeStart).toLocaleDateString())
         .forEach((event) => {
           const point = new PointController(event, eventContainer, this._onDataChange, this._onChangeView);
-          this._points.push(point._activateView.bind(point));
+          this._views.push(point._activateView.bind(point));
         });
     });
   }
@@ -87,6 +87,6 @@ export class TripController {
   }
 
   _onChangeView() {
-    this._points.forEach((it) => it());
+    this._views.forEach((activateView) => activateView());
   }
 }

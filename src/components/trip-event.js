@@ -3,7 +3,7 @@ import {AbstractComponent} from './abstract-component';
 import {makeFirstSymUp, calcDuration} from '../utils';
 
 export class Event extends AbstractComponent {
-  constructor({type, destination, timeStart, timeEnd, price, offers}) {
+  constructor({type, destination, timeStart, timeEnd, price, offers, isFavorite}) {
     super();
     this._type = type;
     this._destination = destination;
@@ -11,6 +11,7 @@ export class Event extends AbstractComponent {
     this._timeEnd = timeEnd;
     this._price = price;
     this._offers = offers;
+    this._isFavorite = isFavorite;
   }
   getTemplate() {
     return `<li class="trip-events__item">

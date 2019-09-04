@@ -8,13 +8,17 @@ import {PointController} from './point-controller';
 export class TripController {
   constructor(events, container) {
     this._events = events;
-    this._originEvents = Object.assign(events);
     this._container = container;
     this._sort = new Sort();
     this._days = new TripDayList();
     this._views = [];
     this._onDataChange = this._onDataChange.bind(this);
     this._onChangeView = this._onChangeView.bind(this);
+  }
+
+  _setEvents(events) {
+    this._events = events;
+    this._renderEvents();
   }
 
   _onSortLinkClick(evt) {
@@ -26,7 +30,6 @@ export class TripController {
 
     this._container.innerHTML = ``;
     render(this._container, this._sort.getElement());
-    this._events = this._originEvents;
     switch (evt.target.dataset.sortType) {
       case `time`:
         this._renderSortedEvents((a, b) => (a.timeEnd - a.timeStart) - (b.timeEnd - b.timeStart));
@@ -40,6 +43,13 @@ export class TripController {
     }
   }
 
+  _renderEvents(container, events) {
+    events.forEach((event) => {
+      const point = new PointController(event, container, this._onDataChange, this._onChangeView);
+      this._views.push(point._activateView.bind(point));
+    });
+  }
+
   _renderSortedEvents(sorting) {
     this._days.getElement().innerHTML = ``;
     const tripDays = this._events.length > 0 ? new TripDayList() : new EmptyEventList();
@@ -49,11 +59,7 @@ export class TripController {
     render(tripDays.getElement(), tripDay.getElement());
     const eventContainer = new EventList();
     render(tripDay.getElement(), eventContainer.getElement());
-    this._events = this._events.slice().sort(sorting);
-    this._events.forEach((event) => {
-      const point = new PointController(event, eventContainer, this._onDataChange, this._onChangeView);
-      this._views.push(point._activateView.bind(point));
-    });
+    this._renderEvents(eventContainer, this._events.slice().sort(sorting));
   }
 
   _renderDayEvents() {
@@ -67,11 +73,8 @@ export class TripController {
       render(tripDays.getElement(), dayElement);
       const eventContainer = new EventList();
       render(dayElement, eventContainer.getElement());
-      this._events.filter(({timeStart}) => new Date(day).toLocaleDateString() === new Date(timeStart).toLocaleDateString())
-        .forEach((event) => {
-          const point = new PointController(event, eventContainer, this._onDataChange, this._onChangeView);
-          this._views.push(point._activateView.bind(point));
-        });
+      const dayEvents = this._events.filter(({timeStart}) => new Date(day).toLocaleDateString() === new Date(timeStart).toLocaleDateString());
+      this._renderEvents(eventContainer, dayEvents);
     });
   }
 

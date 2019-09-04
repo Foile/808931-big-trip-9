@@ -65,7 +65,7 @@ export class EventEdit extends Event {
       </div>
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
       <button class="event__reset-btn" type="reset">Delete</button>
-      <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" checked="">
+      <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${this._isFavorite && `checked=""`}>
       <label class="event__favorite-btn" for="event-favorite-1">
         <span class="visually-hidden">Add to favorite</span>
         <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -108,7 +108,9 @@ export class EventEdit extends Event {
     this.getElement().querySelector(`.event--edit`).reset();
     this.getElement().querySelector(`.event__type-icon`).src = `img/icons/${this._type.title}.png`;
     this.getElement().querySelector(`.event__type-output`).textContent = `${makeFirstSymUp(this._type.title)} ${this._type.type === `activity` ? `in` : `to`}`;
-    this.getElement().querySelector(`.event__destination-description`).textContent = `${this._description}`;
+    this.getElement().querySelector(`.event__destination-description`).textContent = `${this._destination.description}`;
+    this.getElement().querySelector(`.event__photos-tape`).innerHTML = ``;
+    this.getElement().querySelector(`.event__photos-tape`).insertAdjacentHTML(`beforeend`, `${this._destination.photo.map((photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``)}`);
     this.getElement().querySelector(`.event__favorite-checkbox`).checked = this._isFavorite;
 
     if (this._offers.length > 0) {
@@ -117,7 +119,7 @@ export class EventEdit extends Event {
       this.getElement().querySelector(`.event__available-offers`).insertAdjacentHTML(`beforeend`,
           `${this._type.offers.map(({name, title, price: offerPrice}) => `<div class="event__offer-selector">
       <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1"
-      type="checkbox" name="event-offer-${name}" ${this._type.find((offerChecked) => offerChecked.name === name) && `checked=""`}>
+      type="checkbox" name="event-offer-${name}" ${this._offers.find((offerChecked) => offerChecked.name === name) && `checked=""`}>
       <label class="event__offer-label" for="event-offer-${name}-1">
         <span class="event__offer-title">${title}</span>+
         €&nbsp;<span class="event__offer-price">${offerPrice}</span>
@@ -170,9 +172,9 @@ export class EventEdit extends Event {
         const cityData = destinations.find(({name}) => name === target.value);
         this.getElement().querySelector(`.event__destination-description`).textContent = cityData ? cityData.description : `no description`;
         this.getElement().querySelector(`.event__photos-tape`).innerHTML = ``;
-        this.getElement().querySelector(`.event__photos-tape`).insertAdjacentHTML(`beforeend`, cityData ? `${this._destination.photo.map(
-            (photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`
-        ).join(``)}` : ``);
+        this.getElement().querySelector(`.event__photos-tape`).insertAdjacentHTML(`beforeend`, cityData ?
+          `${cityData.photo.map((photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``)}`
+          : ``);
       });
   }
 }

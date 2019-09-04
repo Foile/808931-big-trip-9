@@ -70,7 +70,8 @@ export const getEvent = () => {
     destination: destinations[Math.floor(Math.random() * destinations.length)],
     timeStart: Date.now() + 1 + Math.ceil(Math.random() * 3600) * 1000 * 24 * 7,
     timeEnd: Date.now() + 1 + Math.ceil(Math.random() * 3600) * 1000 * 24 * 7,
-    price: Math.floor(Math.random() * 100 + 1)
+    price: Math.floor(Math.random() * 100 + 1),
+    isFavorite: Boolean(Math.round(Math.random()))
   };
   event.offers = getArrayRandom(event.type.offers, 2);
   return event;

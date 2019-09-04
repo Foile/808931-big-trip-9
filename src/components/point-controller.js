@@ -18,6 +18,7 @@ export class PointController {
   _activateView() {
     if (this._container.getElement().contains(this._eventEditComponent.getElement())) {
       this._container.getElement().replaceChild(this._eventComponent.getElement(), this._eventEditComponent.getElement());
+      this._eventEditComponent.resetForm();
     }
   }
 
@@ -50,7 +51,9 @@ export class PointController {
         timeEnd: formData.get(`event-end-time`),
         price: formData.get(`event-price`),
         offers: offersStack.reduce(((res, offer) => formData.get(`event-offer-${offer.name}`) === `on` ? [...res, offer] : [...res]), []),
+        isFavorite: formData.get(`event-favorite`) === `on`,
       };
+
       this._onDataChange(this._event, entry);
       this._activateView();
       document.removeEventListener(`keydown`, onEscKeyDown);

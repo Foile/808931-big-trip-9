@@ -110,23 +110,27 @@ export class EventEdit extends Event {
     this.getElement().querySelector(`.event__type-output`).textContent = `${makeFirstSymUp(this._type.title)} ${this._type.type === `activity` ? `in` : `to`}`;
     this.getElement().querySelector(`.event__destination-description`).textContent = `${this._destination.description}`;
     this.getElement().querySelector(`.event__photos-tape`).innerHTML = ``;
-    this.getElement().querySelector(`.event__photos-tape`).insertAdjacentHTML(`beforeend`, `${this._destination.photo.map((photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``)}`);
+    this.getElement().querySelector(`.event__photos-tape`).insertAdjacentHTML(`beforeend`,
+        `${this._destination.photo.map(
+            (photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`
+        ).join(``)}`);
     this.getElement().querySelector(`.event__favorite-checkbox`).checked = this._isFavorite;
 
+    const offersClasses = this.getElement().querySelector(`.event__section--offers`).classList;
     if (this._offers.length > 0) {
       this.getElement().querySelector(`.event__section--offers`).classList.remove(`visually-hidden`);
       this.getElement().querySelector(`.event__available-offers`).innerHTML = ``;
       this.getElement().querySelector(`.event__available-offers`).insertAdjacentHTML(`beforeend`,
           `${this._type.offers.map(({name, title, price: offerPrice}) => `<div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1"
-      type="checkbox" name="event-offer-${name}" ${this._offers.find((offerChecked) => offerChecked.name === name) && `checked=""`}>
-      <label class="event__offer-label" for="event-offer-${name}-1">
-        <span class="event__offer-title">${title}</span>+
-        €&nbsp;<span class="event__offer-price">${offerPrice}</span>
-      </label>
-    </div>`).join(``)}`);
-    } else if (!this.getElement().querySelector(`.event__section--offers`).classList.contains(`visually-hidden`)) {
-      this.getElement().querySelector(`.event__section--offers`).classList.add(`visually-hidden`);
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1"
+          type="checkbox" name="event-offer-${name}" ${this._offers.find((offerChecked) => offerChecked.name === name) && `checked=""`}>
+          <label class="event__offer-label" for="event-offer-${name}-1">
+            <span class="event__offer-title">${title}</span>+
+            €&nbsp;<span class="event__offer-price">${offerPrice}</span>
+          </label>
+          </div>`).join(``)}`);
+    } else if (!offersClasses.contains(`visually-hidden`)) {
+      offersClasses.add(`visually-hidden`);
     }
   }
 
@@ -159,7 +163,7 @@ export class EventEdit extends Event {
                 <span class="event__offer-title">${title}</span>+
                 €&nbsp;<span class="event__offer-price">${offerPrice}</span>
               </label>
-            </div>`).join(``)}`);
+              </div>`).join(``)}`);
         });
       });
   }

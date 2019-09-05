@@ -23,6 +23,20 @@ export class PointController {
     }
   }
 
+  _readFormData(formData) {
+    const selectedEventType = eventTypes.find(({title}) => title === formData.get(`event-type`));
+    const destination = destinations.find(({name}) => name === formData.get(`event-destination`));
+    return {
+      type: selectedEventType ? selectedEventType : this._event.type,
+      destination: destination ? destination : {name: formData.get(`event-destination`), description: ``, photo: []},
+      timeStart: moment(formData.get(`event-start-time`), `DD.MM.YYYY HH:mm`),
+      timeEnd: moment(formData.get(`event-end-time`), `DD.MM.YYYY HH:mm`),
+      price: formData.get(`event-price`),
+      offers: offersStack.reduce(((res, offer) => formData.get(`event-offer-${offer.name}`) === `on` ? [...res, offer] : [...res]), []),
+      isFavorite: formData.get(`event-favorite`) === `on`,
+    };
+  }
+
   _renderEvent() {
     const activateEdit = () => {
       this._onChangeView();
@@ -43,18 +57,7 @@ export class PointController {
     this._eventEditComponent.getElement().querySelector(`.event--edit`).addEventListener(`submit`, (evt) => {
       evt.preventDefault();
       const formData = new FormData(this._eventEditComponent.getElement().querySelector(`.event--edit`));
-      const selectedEventType = eventTypes.find(({title}) => title === formData.get(`event-type`));
-      const destination = destinations.find(({name}) => name === formData.get(`event-destination`));
-      const entry = {
-        type: selectedEventType ? selectedEventType : this._event.type,
-        destination: destination ? destination : {name: formData.get(`event-destination`), description: ``, photo: []},
-        timeStart: moment(formData.get(`event-start-time`), `DD.MM.YYYY HH:mm`),
-        timeEnd: moment(formData.get(`event-end-time`), `DD.MM.YYYY HH:mm`),
-        price: formData.get(`event-price`),
-        offers: offersStack.reduce(((res, offer) => formData.get(`event-offer-${offer.name}`) === `on` ? [...res, offer] : [...res]), []),
-        isFavorite: formData.get(`event-favorite`) === `on`,
-      };
-
+      const entry = this._readFormData(formData);
       this._onDataChange(this._event, entry);
       this._activateView();
       document.removeEventListener(`keydown`, onEscKeyDown);

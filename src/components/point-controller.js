@@ -1,4 +1,4 @@
-import {render, unrender} from '../utils';
+import {render, unrender, Position} from '../utils';
 import {Event} from './trip-event';
 import {EventEdit} from './trip-event-edit-form';
 import {offers as offersStack, destinations, eventTypes} from '../data';
@@ -87,7 +87,7 @@ export class PointController {
     });
 
     if (isNew) {
-      render(this._container.getElement(), this._eventEditComponent.getElement(), `afterbegin`);
+      render(this._container.getElement(), this._eventEditComponent.getElement(), Position.AFTERBEGIN);
     } else {
       render(this._container.getElement(), this._eventComponent.getElement());
     }

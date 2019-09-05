@@ -127,6 +127,6 @@ export class TripController {
     };
     event.offers = [];
     // eslint-disable-next-line no-new
-    const newPoint = new PointController(event, this._days, this._onDataChange, this._onChangeView, true);
+    new PointController(event, this._days, this._onDataChange, this._onChangeView, true);
   }
 }

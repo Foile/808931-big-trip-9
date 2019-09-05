@@ -1,7 +1,12 @@
 import {destinations, eventTypeGroups, eventTypes} from '../data';
-import {makeFirstSymUp, DATE_FORMAT, TIME_FORMAT} from '../utils';
+import {makeFirstSymUp} from '../utils';
 import {Event} from './trip-event';
 import moment from 'moment';
+import flatpickr from 'flatpickr';
+
+const removeFlatpickr = (element) => {
+  element.flatpickr().destroy();
+};
 
 export class EventEdit extends Event {
   constructor(event, offersStack) {
@@ -9,6 +14,20 @@ export class EventEdit extends Event {
     this._offersStack = offersStack;
     this._changeOffersByType();
     this._changeDescByCity();
+    const getFlatpickrConfig = (value) => {
+      const config = {
+        defaultDate: [moment(value).valueOf()],
+        enableTime: true,
+        noCalendar: false,
+        altInput: true,
+        altFormat: `h:i`,
+        dateFormat: `h:i`,
+      };
+      return config;
+    };
+
+    flatpickr(this._element.querySelector(`.event__input[name='event-start-time']`), getFlatpickrConfig(this._timeStart));
+    flatpickr(this._element.querySelector(`.event__input[name='event-end-time']`), getFlatpickrConfig(this._timeEnd));
   }
   getTemplate() {
     return `<li class="trip-events__item">
@@ -44,12 +63,12 @@ export class EventEdit extends Event {
         <label class="visually-hidden" for="event-start-time-1">
           From
         </label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${moment(this._timeStart).format(`${DATE_FORMAT} ${TIME_FORMAT}`)}">
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${this._timeStart}">
         —
         <label class="visually-hidden" for="event-end-time-1">
           To
         </label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${moment(this._timeEnd).format(`DD.MM.YYYY HH:mm`)}">
+        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${this._timeEnd}">
       </div>
       <div class="event__field-group  event__field-group--price">
         <label class="event__label" for="event-price-1">
@@ -177,4 +196,10 @@ export class EventEdit extends Event {
           : ``);
       });
   }
+
+  removeElement() {
+    removeFlatpickr(this._element);
+    this._element = null;
+  }
+
 }

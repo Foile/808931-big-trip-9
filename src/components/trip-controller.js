@@ -1,6 +1,6 @@
 import {EventList, EmptyEventList} from './trip-event-list';
 import {TripDay} from './trip-day';
-import {render, calcPrice} from '../utils';
+import {render, unrender, calcPrice, Position} from '../utils';
 import {TripDayList} from './trip-day-list';
 import {Sort} from './sort';
 import {PointController} from './point-controller';
@@ -14,8 +14,10 @@ export class TripController {
     this._views = [];
     this._onDataChange = this._onDataChange.bind(this);
     this._onChangeView = this._onChangeView.bind(this);
+    this._onCancel = this._onCancel.bind(this);
     this._totalPriceElement = totalPriceElement;
-    this._eventContainer = null;
+    this._addEventController = null;
+    this._addEventContainer = null;
   }
 
   _onSortLinkClick(evt) {
@@ -103,6 +105,7 @@ export class TripController {
     if (newData === null) {
       this._events = [...this._events.slice(0, index), ...this._events.slice(index + 1)];
     } else if (oldData === null) {
+      this._addEventController = null;
       this._events = [newData, ...this._events];
     } else {
       this._events[index] = newData;
@@ -114,11 +117,17 @@ export class TripController {
     this._views.forEach((activateView) => activateView());
   }
 
+  _onCancel() {
+    this._addEventController = null;
+    unrender(this._addEventContainer);
+  }
+
   createEvent() {
+    if (this._addEventController !== null) {
+      return;
+    }
     let event = {
-      type: {
-        title: `drive`, type: `transport`, offers: []
-      },
+      type: {title: `drive`, type: `transport`, offers: []},
       destination: {name: ``, description: ``, photo: []},
       timeStart: Date.now(),
       timeEnd: Date.now(),
@@ -126,7 +135,11 @@ export class TripController {
       isFavorite: false
     };
     event.offers = [];
-    // eslint-disable-next-line no-new
-    new PointController(event, this._days, this._onDataChange, this._onChangeView, true);
+    const tripDay = new TripDay();
+    render(this._days.getElement(), tripDay.getElement(), Position.AFTERBEGIN);
+    this._eventContainer = new EventList();
+    render(tripDay.getElement(), this._eventContainer.getElement(), Position.BEFOREEND);
+    this._addEventContainer = tripDay;
+    this._addEventController = new PointController(event, this._eventContainer, this._onDataChange, this._onChangeView, this._onCancel, true);
   }
 }

@@ -1,17 +1,18 @@
-import {render} from '../utils';
+import {render, unrender} from '../utils';
 import {Event} from './trip-event';
 import {EventEdit} from './trip-event-edit-form';
 import {offers as offersStack, destinations, eventTypes} from '../data';
 import moment from 'moment';
 
 export class PointController {
-  constructor(event, container, onDataChange, onChangeView, isNew) {
+  constructor(event, container, onDataChange, onChangeView, onCancel, isNew) {
     this._event = event;
     this._container = container;
     this._onDataChange = onDataChange;
     this._onChangeView = onChangeView;
     this._eventComponent = new Event(event);
     this._eventEditComponent = new EventEdit(event, offersStack);
+    this._onCancel = onCancel;
     this.init(isNew);
   }
 
@@ -26,7 +27,6 @@ export class PointController {
     this._onChangeView();
     if (this._container.getElement().contains(this._eventComponent.getElement())) {
       this._container.getElement().replaceChild(this._eventEditComponent.getElement(), this._eventComponent.getElement());
-      document.addEventListener(`keydown`, this._onEscKeyDown);
     }
   }
 
@@ -52,7 +52,9 @@ export class PointController {
         document.removeEventListener(`keydown`, onEscKeyDown);
       }
     };
-    this._eventComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => this._activateEdit());
+    this._eventComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+      this._activateEdit(); document.addEventListener(`keydown`, onEscKeyDown);
+    });
     this._eventEditComponent.getElement().querySelector(`.event--edit`).addEventListener(`submit`, (evt) => {
       evt.preventDefault();
       const formData = new FormData(this._eventEditComponent.getElement().querySelector(`.event--edit`));
@@ -64,12 +66,24 @@ export class PointController {
 
     this._eventEditComponent.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, (evt) => {
       evt.preventDefault();
+      if (isNew) {
+        unrender(this._eventEditComponent);
+        this._onCancel();
+        return;
+      }
       this._onDataChange(this._event, null);
+
     });
 
     this._eventEditComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
-      this._activateView();
-      document.addEventListener(`keydown`, onEscKeyDown);
+      if (!isNew) {
+        this._activateView();
+        document.addEventListener(`keydown`, onEscKeyDown);
+      } else {
+        unrender(this._eventEditComponent);
+        this._onCancel();
+      }
+
     });
 
     if (isNew) {

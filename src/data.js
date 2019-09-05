@@ -1,3 +1,14 @@
+const getArrayRandom = (array, maxCount) => {
+  let result = new Set();
+  for (let i = 0; i < maxCount; i++) {
+    const rnd = Boolean(Math.round(Math.random()));
+    if (rnd) {
+      result.add(array[Math.floor(Math.random() * array.length)]);
+    }
+  }
+  return Array.from(result);
+};
+
 const eventTitles = [
   [`flight`, `transfer`],
   [`train`, `transfer`],
@@ -19,25 +30,25 @@ export const eventTypeGroups = eventTitles.reduce(
     {}
 );
 
-export const eventType = [
-  {title: `flight`, type: `transfer`},
-  {title: `train`, type: `transfer`},
-  {title: `ship`, type: `transfer`},
-  {title: `drive`, type: `transfer`},
-  {title: `transport`, type: `transfer`},
-  {title: `bus`, type: `transfer`},
-  {title: `taxi`, type: `transfer`},
-  {title: `check-in`, type: `activity`},
-  {title: `sightseeing`, type: `activity`},
-  {title: `restaurant`, type: `activity`}
-];
-
-export const offer = [
+export const offers = [
   {title: `Add luggage`, name: `luggage`, price: 30},
   {title: `Switch to comfort class`, name: `comfort`, price: 100},
   {title: `Add meal`, name: `meal`, price: 15},
   {title: `Choose seats`, name: `seats`, price: 5},
   {title: `Travel by train`, name: `train`, price: 40}
+];
+
+export const eventTypes = [
+  {title: `flight`, type: `transfer`, offers: getArrayRandom(offers, 5)},
+  {title: `train`, type: `transfer`, offers: getArrayRandom(offers, 5)},
+  {title: `ship`, type: `transfer`, offers: getArrayRandom(offers, 5)},
+  {title: `drive`, type: `transfer`, offers: getArrayRandom(offers, 5)},
+  {title: `transport`, type: `transfer`, offers: getArrayRandom(offers, 5)},
+  {title: `bus`, type: `transfer`, offers: getArrayRandom(offers, 5)},
+  {title: `taxi`, type: `transfer`, offers: getArrayRandom(offers, 5)},
+  {title: `check-in`, type: `activity`, offers: getArrayRandom(offers, 5)},
+  {title: `sightseeing`, type: `activity`, offers: getArrayRandom(offers, 5)},
+  {title: `restaurant`, type: `activity`, offers: getArrayRandom(offers, 5)}
 ];
 
 export const destinations = [
@@ -50,30 +61,20 @@ export const destinations = [
 ];
 
 destinations.map((destination) => {
-  destination.photo = Array(Math.floor(Math.random() * 10)).fill().map(()=> `http://picsum.photos/300/150?r=${Math.random()}`);
+  destination.photo = Array(Math.floor(Math.random() * 10)).fill().map(() => `http://picsum.photos/300/150?r=${Math.random()}`);
 });
 
-
-const getArrayRandom = (array, maxCount) => {
-  let result = new Set();
-  for (let i = 0; i < maxCount; i++) {
-    const rnd = Boolean(Math.round(Math.random()));
-    if (rnd) {
-      result.add(array[Math.floor(Math.random() * array.length)]);
-    }
-  }
-  return Array.from(result);
-};
-
 export const getEvent = () => {
-  return {
-    type: eventType[Math.floor(Math.random() * eventType.length)],
+  let event = {
+    type: eventTypes[Math.floor(Math.random() * eventTypes.length)],
     destination: destinations[Math.floor(Math.random() * destinations.length)],
     timeStart: Date.now() + 1 + Math.ceil(Math.random() * 3600) * 1000 * 24 * 7,
     timeEnd: Date.now() + 1 + Math.ceil(Math.random() * 3600) * 1000 * 24 * 7,
     price: Math.floor(Math.random() * 100 + 1),
-    offers: getArrayRandom(offer, 2),
+    isFavorite: Boolean(Math.round(Math.random()))
   };
+  event.offers = getArrayRandom(event.type.offers, 2);
+  return event;
 };
 
 export const getFilters = () => [

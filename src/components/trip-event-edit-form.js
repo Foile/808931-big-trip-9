@@ -3,6 +3,8 @@ import {makeFirstSymUp} from '../utils';
 import {Event} from './trip-event';
 import moment from 'moment';
 import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
+import 'flatpickr/dist/themes/light.css';
 
 const removeFlatpickr = (element) => {
   element.flatpickr().destroy();
@@ -19,9 +21,9 @@ export class EventEdit extends Event {
         defaultDate: [moment(value).valueOf()],
         enableTime: true,
         noCalendar: false,
-        altInput: true,
+        altInput: false,
         altFormat: `h:i`,
-        dateFormat: `h:i`,
+        dateFormat: `d-m-y h:i`,
       };
       return config;
     };

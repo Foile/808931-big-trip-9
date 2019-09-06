@@ -36,11 +36,11 @@ export class EventEdit extends Event {
     <form class="event  event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
-        <label class="event__type  event__type-btn" for="event-type-toggle-1">
+        <label class="event__type event__type-btn" for="event-type-toggle-1">
           <span class="visually-hidden">Choose event type</span>
-          <img class="event__type-icon" width="17" height="17" src="img/icons/${this._type.title}.png" alt="Event type icon">
+          <img class="event__type-icon" width="17" height="17" src="${this._type.title.length > 0 ? `img/icons/${this._type.title}.png` : ``}" alt="Event type icon">
         </label>
-        <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+        <input class="event__type-toggle visually-hidden" id="event-type-toggle-1" type="checkbox">
         <div class="event__type-list">
         ${Object.keys(eventTypeGroups).map((group) => `
     <fieldset class="event__type-group">
@@ -86,7 +86,7 @@ export class EventEdit extends Event {
       </div>
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
       <button class="event__reset-btn" type="reset">Delete</button>
-      <input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${this._isFavorite && `checked=""`}>
+      <input id="event-favorite-1" class="event__favorite-checkbox visually-hidden" type="checkbox" name="event-favorite" ${this._isFavorite && `checked=""`}>
       <label class="event__favorite-btn" for="event-favorite-1">
         <span class="visually-hidden">Add to favorite</span>
         <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">

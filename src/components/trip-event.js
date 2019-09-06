@@ -18,7 +18,7 @@ export class Event extends AbstractComponent {
     return `<li class="trip-events__item">
   <div class="event">
     <div class="event__type">
-      <img class="event__type-icon" width="42" height="42" src="img/icons/${this._type.title}.png" alt="Event type icon">
+      <img class="event__type-icon" width="42" height="42" src="${this._type.title.length > 0 ? `img/icons/${this._type.title}.png` : ``}" alt="Event type icon">
     </div>
     <h3 class="event__title">${makeFirstSymUp(this._type.title)} ${this._type.type === `activity` ? `in` : `to`} ${this._destination.name}</h3>
     <div class="event__schedule">

@@ -22,4 +22,18 @@ export class AbstractComponent {
   getTemplate() {
     throw Error(`Abstract method not implemented`);
   }
+
+  hide() {
+    const classes = this.getElement().classList;
+    if (!classes.contains(`visually-hidden`)) {
+      classes.add(`visually-hidden`);
+    }
+  }
+
+  show() {
+    const classes = this.getElement().classList;
+    if (classes.contains(`visually-hidden`)) {
+      classes.remove(`visually-hidden`);
+    }
+  }
 }

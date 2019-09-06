@@ -1,3 +1,4 @@
+import {makeFirstSymUp} from '../utils';
 import {AbstractComponent} from './abstract-component';
 
 export class Menu extends AbstractComponent {
@@ -7,7 +8,9 @@ export class Menu extends AbstractComponent {
   }
   getTemplate() {
     return `<nav class="trip-controls__trip-tabs  trip-tabs">
-  ${this._tabs.map(({name, link, active}) => `<a class="trip-tabs__btn  ${active ? `trip-tabs__btn--active` : ``}" href="${link}">${name}</a>`)}
+  ${this._tabs.map(({name, link, active}) => `<a class="trip-tabs__btn
+  ${active ? `trip-tabs__btn--active` : ``}"
+  href="${link}" data-switch="${name}">${makeFirstSymUp(name)}</a>`)}
   </nav>`;
   }
 }

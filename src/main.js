@@ -18,8 +18,10 @@ render(tripInfo, new TripInfo(events).getElement(), Position.AFTERBEGIN);
 const tripInfoCostElement = document.querySelector(`.trip-info__cost`);
 const tripEventsElement = document.querySelector(`.trip-events`);
 const tripController = new TripController(events, tripEventsElement, tripInfoCostElement.querySelector(`.trip-info__cost-value`));
-const statistics = new Statistics();
+const statistics = new Statistics([{name: `money`}, {name: `transport`}, {name: `time`}], events);
 statistics.hide();
+
+statistics.calcStatistics(events);
 
 menu.getElement().addEventListener(`click`, (evt) => {
   evt.preventDefault();

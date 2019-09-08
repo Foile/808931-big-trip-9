@@ -6,7 +6,6 @@ import moment from 'moment';
 import {eventTypes} from '../data';
 
 const BAR_HEIGHT = 55;
-const typeEmoji = new Map([[], [], [], [], []]);
 
 export class Statistics extends AbstractComponent {
   constructor(statistics, events) {

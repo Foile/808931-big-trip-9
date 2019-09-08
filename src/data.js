@@ -39,16 +39,16 @@ export const offers = [
 ];
 
 export const eventTypes = [
-  {title: `flight`, type: `transfer`, offers: getArrayRandom(offers, 5)},
-  {title: `train`, type: `transfer`, offers: getArrayRandom(offers, 5)},
-  {title: `ship`, type: `transfer`, offers: getArrayRandom(offers, 5)},
-  {title: `drive`, type: `transfer`, offers: getArrayRandom(offers, 5)},
-  {title: `transport`, type: `transfer`, offers: getArrayRandom(offers, 5)},
-  {title: `bus`, type: `transfer`, offers: getArrayRandom(offers, 5)},
-  {title: `taxi`, type: `transfer`, offers: getArrayRandom(offers, 5)},
-  {title: `check-in`, type: `activity`, offers: getArrayRandom(offers, 5)},
-  {title: `sightseeing`, type: `activity`, offers: getArrayRandom(offers, 5)},
-  {title: `restaurant`, type: `activity`, offers: getArrayRandom(offers, 5)}
+  {title: `flight`, type: `transfer`, offers: getArrayRandom(offers, 5), emoji: `️✈️`},
+  {title: `train`, type: `transfer`, offers: getArrayRandom(offers, 5), emoji: `🚂`},
+  {title: `ship`, type: `transfer`, offers: getArrayRandom(offers, 5), emoji: `🛳`},
+  {title: `drive`, type: `transfer`, offers: getArrayRandom(offers, 5), emoji: `🚗`},
+  {title: `transport`, type: `transfer`, offers: getArrayRandom(offers, 5), emoji: `🚊`},
+  {title: `bus`, type: `transfer`, offers: getArrayRandom(offers, 5), emoji: `🚌`},
+  {title: `taxi`, type: `transfer`, offers: getArrayRandom(offers, 5), emoji: `🚕`},
+  {title: `check-in`, type: `activity`, offers: getArrayRandom(offers, 5), emoji: `🏨`},
+  {title: `sightseeing`, type: `activity`, offers: getArrayRandom(offers, 5), emoji: `🏛`},
+  {title: `restaurant`, type: `activity`, offers: getArrayRandom(offers, 5), emoji: `🍴`}
 ];
 
 export const destinations = [

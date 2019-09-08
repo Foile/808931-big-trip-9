@@ -21,8 +21,6 @@ const tripController = new TripController(events, tripEventsElement, tripInfoCos
 const statistics = new Statistics([{name: `money`}, {name: `transport`}, {name: `time`}], events);
 statistics.hide();
 
-statistics.calcStatistics(events);
-
 menu.getElement().addEventListener(`click`, (evt) => {
   evt.preventDefault();
   const target = evt.target;

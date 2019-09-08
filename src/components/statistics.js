@@ -1,9 +1,12 @@
 import {AbstractComponent} from './abstract-component';
-import {lodash} from 'lodash';
+// import {_} from 'lodash';
 import {Chart} from 'chart.js';
 import {createElement} from '../utils';
+import moment from 'moment';
+import {eventTypes} from '../data';
 
 const BAR_HEIGHT = 55;
+const typeEmoji = new Map([[], [], [], [], []]);
 
 export class Statistics extends AbstractComponent {
   constructor(statistics, events) {
@@ -13,9 +16,7 @@ export class Statistics extends AbstractComponent {
     this._charts = [];
   }
   getTemplate() {
-    return `<section class="statistics">
-    <h2>Trip statistics</h2>
-  </section>`;
+    return `<section class="statistics"><h2>Trip statistics</h2></section>`;
   }
 
   getElement() {
@@ -26,16 +27,13 @@ export class Statistics extends AbstractComponent {
         const statContainer = createElement(`<div class="statistics__item statistics__item--${name}"></div>`);
         statContainer.appendChild(ctx);
         element.appendChild(statContainer);
-        const chart = new Chart(ctx, this.configChart(this.getStatistics(name, this._events), name));
+        const chart = new Chart(ctx, this.configChart(this.getStatistics(name, this._events), name === `time` ? `time spent` : name));
         this._charts.push(chart);
         this._element = element;
       });
-
     }
-
     return this._element;
   }
-
 
   getStatistics(name, events) {
     switch (name) {
@@ -46,25 +44,57 @@ export class Statistics extends AbstractComponent {
     }
   }
 
+  getChartTitle(title) {
+    return `${eventTypes.find((eventType) => eventType.title === title).emoji} ${title.toUpperCase()}`;
+  }
 
   getTransportData(events) {
-    return this.calcStatistics(events);
+    let obj = {labels: [], data: []};
+    events.filter(({type})=> type.type === `transfer`).forEach(({type})=> {
+      const title = this.getChartTitle(type.title);
+      const index = obj.labels.indexOf(title);
+      if (index === -1) {
+        obj.labels.push(title);
+        obj.data.push(1);
+      } else {
+        obj.data[index]++;
+      }
+    });
+    return obj;
   }
 
   getMoneyData(events) {
-    return this.calcStatistics(events);
-  }
-  getTimeData(events) {
-    return this.calcStatistics(events);
+    let obj = {labels: [], data: []};
+    events.forEach(({type, price})=> {
+      const title = this.getChartTitle(type.title);
+      const index = obj.labels.indexOf(title);
+      if (index === -1) {
+        obj.labels.push(title);
+        obj.data.push(price);
+      } else {
+        obj.data[index] += price;
+      }
+    });
+    return obj;
   }
 
-  calcStatistics(events) {
-    return {labels: [`test`], data: [12]};
+  getTimeData(events) {
+    let obj = {labels: [], data: []};
+    events.forEach(({type, timeStart, timeEnd})=> {
+      const title = this.getChartTitle(type.title);
+      const index = obj.labels.indexOf(title);
+      if (index === -1) {
+        obj.labels.push(title);
+        obj.data.push(Math.abs(moment(timeEnd).diff(moment(timeStart))));
+      } else {
+        obj.data[index] += Math.abs(moment(timeEnd).diff(moment(timeStart)));
+      }
+    });
+    return obj;
   }
 
   configChart({labels, data}, title) {
     return {
-      plugins: [labels],
       type: `horizontalBar`,
       data: {
         labels,
@@ -78,8 +108,8 @@ export class Statistics extends AbstractComponent {
       options: {
         plugins: {
           datalabels: {
-            display: false
-          }
+            display: true
+          },
         },
         title: {
           display: true,
@@ -93,13 +123,13 @@ export class Statistics extends AbstractComponent {
             ticks: {
               fontColor: `#000000`,
               padding: 5,
-              fontSize: 13,
+              fontSize: 10,
             },
             gridLines: {
               display: false,
               drawBorder: false
             },
-            barThickness: 44,
+            barThickness: BAR_HEIGHT,
           }],
           xAxes: [{
             ticks: {
@@ -110,7 +140,7 @@ export class Statistics extends AbstractComponent {
               display: false,
               drawBorder: false
             },
-            minBarLength: 50
+            minBarLength: 20
           }],
         },
         legend: {
@@ -122,4 +152,6 @@ export class Statistics extends AbstractComponent {
       }
     };
   }
+
+
 }

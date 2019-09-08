@@ -7,8 +7,6 @@ import {TripController} from './components/trip-controller';
 import {Statistics} from './components/statistics';
 
 const EVENT_COUNT = 6;
-const FILTERS = getFilters();
-let filter = FILTERS[0];
 
 const events = Array(EVENT_COUNT).fill().map(() => getEvent())
   .sort((event1, event2) => event1.timeStart - event2.timeStart);

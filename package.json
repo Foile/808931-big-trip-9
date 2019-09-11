@@ -10,20 +10,23 @@
     "test": "npm run eslint"
   },
   "devDependencies": {
+    "css-loader": "^3.2.0",
     "eslint": "6.1.0",
     "eslint-config-htmlacademy": "0.5.2",
-    "webpack": "4.29.5",
-    "webpack-cli": "3.2.3",
-    "webpack-dev-server": "3.1.14",
     "npm": "^6.11.3",
     "style-loader": "^1.0.0",
-    "css-loader": "^3.2.0"
+    "webpack": "4.29.5",
+    "webpack-cli": "3.2.3",
+    "webpack-dev-server": "3.1.14"
   },
   "engines": {
     "node": "10"
   },
   "dependencies": {
-    "moment": "^2.24.0",
-    "flatpickr": "^4.6.2"
+    "chart.js": "^2.8.0",
+    "chartjs-plugin-datalabels": "^0.6.0",
+    "flatpickr": "^4.6.2",
+    "lodash": "^4.17.15",
+    "moment": "^2.24.0"
   }
 }

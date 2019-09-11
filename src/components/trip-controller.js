@@ -4,9 +4,10 @@ import {render, unrender, calcPrice, Position} from '../utils';
 import {TripDayList} from './trip-day-list';
 import {Sort} from './sort';
 import {PointController} from './point-controller';
+import {getFilters} from '../data';
 
 export class TripController {
-  constructor(events, container, totalPriceElement) {
+  constructor(events, container, totalPriceElement, filters) {
     this._events = events;
     this._container = container;
     this._sort = new Sort();
@@ -18,6 +19,9 @@ export class TripController {
     this._totalPriceElement = totalPriceElement;
     this._addEventController = null;
     this._addEventContainer = null;
+    this._filters = filters;
+    this._currentFilter = getFilters()[0];
+    this._currentSort = `day`;
   }
 
   _onSortLinkClick(evt) {
@@ -26,26 +30,15 @@ export class TripController {
     }
     evt.preventDefault();
     evt.target.form.querySelector(`#sort-${evt.target.dataset.sortType}`).checked = true;
-
     this._container.innerHTML = ``;
     this._sort.getElement().querySelector(`.trip-sort__item--day`).innerHTML = ``;
     render(this._container, this._sort.getElement());
-    switch (evt.target.dataset.sortType) {
-      case `time`:
-        this._renderSortedEvents((a, b) => (a.timeEnd - a.timeStart) - (b.timeEnd - b.timeStart));
-        break;
-      case `price`:
-        this._renderSortedEvents((a, b) => a.price - b.price);
-        break;
-      default:
-        this._renderDayEvents();
-        this._sort.getElement().querySelector(`.trip-sort__item--day`).innerHTML = `Day`;
-        break;
-    }
+    this._currentSort = evt.target.dataset.sortType;
+    this.update();
   }
 
   _renderEvents(container, events) {
-    events.forEach((event) => {
+    events.filter(this._currentFilter.callback).forEach((event) => {
       const point = new PointController(event, container, this._onDataChange, this._onChangeView);
       this._views.push(point._activateView.bind(point));
     });
@@ -80,26 +73,49 @@ export class TripController {
     });
   }
 
+  _onFilterClick(evt) {
+    if (evt.target.tagName[0].toLowerCase() !== `i`) {
+      return;
+    }
+    this._currentFilter = getFilters().find(({title})=>evt.target.value === title.toLowerCase());
+    this.update();
+  }
+
   init() {
     render(this._container, this._sort.getElement());
     this._renderDayEvents(this._events);
     this._sort.getElement().addEventListener(`click`, (evt) => this._onSortLinkClick(evt));
+    this._filters.getElement().addEventListener(`click`, (evt)=> this._onFilterClick(evt));
   }
 
   hide() {
-    const classes = this._days.getElement().classList;
+    const classes = this._container.classList;
     if (!classes.contains(`visually-hidden`)) {
       classes.add(`visually-hidden`);
     }
   }
 
   show() {
-    const classes = this._days.getElement().classList;
+    const classes = this._container.classList;
     if (classes.contains(`visually-hidden`)) {
       classes.remove(`visually-hidden`);
     }
   }
 
+  update() {
+    switch (this._currentSort) {
+      case `time`:
+        this._renderSortedEvents((a, b) => (a.timeEnd - a.timeStart) - (b.timeEnd - b.timeStart));
+        break;
+      case `price`:
+        this._renderSortedEvents((a, b) => a.price - b.price);
+        break;
+      default:
+        this._renderDayEvents();
+        this._sort.getElement().querySelector(`.trip-sort__item--day`).innerHTML = `Day`;
+        break;
+    }
+  }
   _onDataChange(oldData, newData) {
     const index = this._events.findIndex((event) => event === oldData);
     if (newData === null) {

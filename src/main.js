@@ -17,8 +17,11 @@ const tripInfo = document.querySelector(`.trip-main__trip-info`);
 render(tripInfo, new TripInfo(events).getElement(), Position.AFTERBEGIN);
 const tripInfoCostElement = document.querySelector(`.trip-info__cost`);
 const tripEventsElement = document.querySelector(`.trip-events`);
-const tripController = new TripController(events, tripEventsElement, tripInfoCostElement.querySelector(`.trip-info__cost-value`));
-const statistics = new Statistics();
+const filters = new Filters(getFilters());
+
+const tripController = new TripController(events, tripEventsElement, tripInfoCostElement.querySelector(`.trip-info__cost-value`), filters);
+const statistics = new Statistics([{name: `money`}, {name: `transport`}, {name: `time`}], events);
+
 statistics.hide();
 
 menu.getElement().addEventListener(`click`, (evt) => {
@@ -52,9 +55,8 @@ addNewPointBtn.addEventListener(`click`, () => {
   tripController.show();
   tripController.createEvent();
 });
+const tripControlsElement = document.querySelector(`.trip-main__trip-controls`);
+render(tripControlsElement, filters.getElement());
+render(tripEventsElement.parentNode, statistics.getElement());
 
 tripController.init();
-const tripControlsElement = document.querySelector(`.trip-main__trip-controls`);
-render(tripControlsElement, new Filters(getFilters(events)).getElement());
-
-render(tripEventsElement.parentNode, statistics.getElement());

@@ -39,12 +39,10 @@ export const calcDuration = (timeStart, timeEnd) => {
     hour: 3600,
     minute: 60
   };
-
   Object.keys(partTime).forEach((key) => {
     result[key] = Math.floor(diff / partTime[key]);
     diff -= result[key] * partTime[key];
   });
-
   return Object.keys(result).map((cur) => result[cur] > 0 ? `${result[cur]} ${cur[0].toUpperCase()} ` : ``).join(` `);
 };
 

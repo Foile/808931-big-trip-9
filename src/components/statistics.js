@@ -5,7 +5,7 @@ import {createElement} from '../utils';
 import moment from 'moment';
 import {eventTypes} from '../data';
 
-const BAR_HEIGHT = 55;
+const BAR_HEIGHT = 40;
 
 export class Statistics extends AbstractComponent {
   constructor(statistics, events) {
@@ -26,7 +26,9 @@ export class Statistics extends AbstractComponent {
         const statContainer = createElement(`<div class="statistics__item statistics__item--${name}"></div>`);
         statContainer.appendChild(ctx);
         element.appendChild(statContainer);
-        const chart = new Chart(ctx, this.configChart(this.getStatistics(name, this._events), name === `time` ? `time spent` : name));
+        const stat = this.getStatistics(name, this._events);
+        ctx.height = stat.data.length * (BAR_HEIGHT + 2);
+        const chart = new Chart(ctx, this.configChart(stat, name === `time` ? `time spent` : name));
         this._charts.push(chart);
         this._element = element;
       });
@@ -48,48 +50,34 @@ export class Statistics extends AbstractComponent {
   }
 
   getTransportData(events) {
-    let obj = {labels: [], data: []};
-    events.filter(({type})=> type.type === `transfer`).forEach(({type})=> {
+    let obj = new Map();
+    events.filter(({type}) => type.type === `transfer`).forEach(({type}) => {
       const title = this.getChartTitle(type.title);
-      const index = obj.labels.indexOf(title);
-      if (index === -1) {
-        obj.labels.push(title);
-        obj.data.push(1);
-      } else {
-        obj.data[index]++;
-      }
+      const cnt = obj.has(title) ? obj.get(title) : 0;
+      obj.set(title, cnt + 1);
     });
-    return obj;
+    return {labels: [...obj.keys()], data: [...obj.values()]};
   }
 
   getMoneyData(events) {
-    let obj = {labels: [], data: []};
-    events.forEach(({type, price})=> {
+    let obj = new Map();
+    events.forEach(({type, price}) => {
       const title = this.getChartTitle(type.title);
-      const index = obj.labels.indexOf(title);
-      if (index === -1) {
-        obj.labels.push(title);
-        obj.data.push(price);
-      } else {
-        obj.data[index] += price;
-      }
+      const prc = obj.has(title) ? obj.get(title) : 0;
+      obj.set(title, prc + price);
     });
-    return obj;
+    return {labels: [...obj.keys()], data: [...obj.values()]};
   }
 
   getTimeData(events) {
-    let obj = {labels: [], data: []};
-    events.forEach(({type, timeStart, timeEnd})=> {
+    let obj = new Map();
+    events.forEach(({type, timeStart, timeEnd}) => {
       const title = this.getChartTitle(type.title);
-      const index = obj.labels.indexOf(title);
-      if (index === -1) {
-        obj.labels.push(title);
-        obj.data.push(Math.abs(moment(timeEnd).diff(moment(timeStart))));
-      } else {
-        obj.data[index] += Math.abs(moment(timeEnd).diff(moment(timeStart)));
-      }
+      const time = Math.abs(moment(timeEnd).diff(moment(timeStart)));
+      const cnt = obj.has(title) ? obj.get(title) : 0;
+      obj.set(title, cnt + time);
     });
-    return obj;
+    return {labels: [...obj.keys()], data: [...obj.values()]};
   }
 
   configChart({labels, data}, title) {
@@ -140,6 +128,7 @@ export class Statistics extends AbstractComponent {
               drawBorder: false
             },
             minBarLength: 20
+
           }],
         },
         legend: {

@@ -35,7 +35,8 @@ export class Api {
     return this._load({url: `destinations`}).then(toJSON).then(ModelDestination.parseDestinations);
   }
 
-  createEvent({Event}) {
+  createEvent({event}) {
+
   }
 
   updateEvent({id, data}) {

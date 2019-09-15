@@ -1,7 +1,7 @@
 import {render, unrender, Position} from '../utils';
 import {Event} from './trip-event';
 import {EventEdit} from './trip-event-edit-form';
-import {offers as offersStack, destinations, eventTypes} from '../data';
+import {destinations, eventTypes} from '../data';
 import moment from 'moment';
 
 export class PointController {
@@ -11,7 +11,7 @@ export class PointController {
     this._onDataChange = onDataChange;
     this._onChangeView = onChangeView;
     this._eventComponent = new Event(event);
-    this._eventEditComponent = new EventEdit(event, offersStack);
+    this._eventEditComponent = new EventEdit(event, event.type.offers);
     this._onCancel = onCancel;
     this.init(isNew);
   }
@@ -39,7 +39,7 @@ export class PointController {
       timeStart: moment(formData.get(`event-start-time`), `DD.MM.YYYY HH:mm`),
       timeEnd: moment(formData.get(`event-end-time`), `DD.MM.YYYY HH:mm`),
       price: formData.get(`event-price`),
-      offers: offersStack.reduce(((res, offer) => formData.get(`event-offer-${offer.name}`) === `on` ? [...res, offer] : [...res]), []),
+      offers: this._event.type.offers.reduce(((res, offer) => formData.get(`event-offer-${offer.title}`) === `on` ? [...res, offer] : [...res]), []),
       isFavorite: formData.get(`event-favorite`) === `on`,
     };
     return event;

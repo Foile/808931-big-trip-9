@@ -101,14 +101,14 @@ export class EventEdit extends Event {
       <section class="event__section  event__section--offers">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
         <div class="event__available-offers">
-        ${this._type.offers.map(({name, title, price: offerPrice}) => `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1"
-        type="checkbox" name="event-offer-${name}" ${this._offers.find((offerChecked) => offerChecked.name === name) && `checked=""`}>
-        <label class="event__offer-label" for="event-offer-${name}-1">
-          <span class="event__offer-title">${title}</span>+
+        ${this._type.offers ? this._type.offers.map(({name, title, price: offerPrice}) => `<div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${title}-1"
+        type="checkbox" name="event-offer-${title}" ${this._offers.find((offerChecked) => offerChecked.title === title) && `checked=""`}>
+        <label class="event__offer-label" for="event-offer-${title}-1">
+          <span class="event__offer-title">${name}</span>+
           €&nbsp;<span class="event__offer-price">${offerPrice}</span>
         </label>
-      </div>`).join(``)}
+      </div>`).join(``) : ``}
         </div>
       </section>
       <section class="event__section  event__section--destination">
@@ -116,7 +116,7 @@ export class EventEdit extends Event {
         <p class="event__destination-description">${this._destination.description}</p>
         <div class="event__photos-container">
           <div class="event__photos-tape">
-          ${this._destination.photo.map((photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``)}
+          ${this._destination.pictures ? this._destination.pictures.map(({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`).join(``) : ``}
           </div>
         </div>
       </section>
@@ -132,7 +132,7 @@ export class EventEdit extends Event {
     this.getElement().querySelector(`.event__destination-description`).textContent = `${this._destination.description}`;
     this.getElement().querySelector(`.event__photos-tape`).innerHTML = ``;
     this.getElement().querySelector(`.event__photos-tape`).insertAdjacentHTML(`beforeend`,
-        `${this._destination.photo.map(
+        `${this._destination.pictures.map(
             (photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`
         ).join(``)}`);
     this.getElement().querySelector(`.event__favorite-checkbox`).checked = this._isFavorite;
@@ -143,10 +143,10 @@ export class EventEdit extends Event {
       this.getElement().querySelector(`.event__available-offers`).innerHTML = ``;
       this.getElement().querySelector(`.event__available-offers`).insertAdjacentHTML(`beforeend`,
           `${this._type.offers.map(({name, title, price: offerPrice}) => `<div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1"
-          type="checkbox" name="event-offer-${name}" ${this._offers.find((offerChecked) => offerChecked.name === name) && `checked=""`}>
-          <label class="event__offer-label" for="event-offer-${name}-1">
-            <span class="event__offer-title">${title}</span>+
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${title}-1"
+          type="checkbox" name="event-offer-${title}" ${this._offers.find((offerChecked) => offerChecked.title === title) && `checked=""`}>
+          <label class="event__offer-label" for="event-offer-${title}-1">
+            <span class="event__offer-title">${name}</span>+
             €&nbsp;<span class="event__offer-price">${offerPrice}</span>
           </label>
           </div>`).join(``)}`);
@@ -178,10 +178,10 @@ export class EventEdit extends Event {
           this.getElement().querySelector(`.event__available-offers`).innerHTML = ``;
           this.getElement().querySelector(`.event__available-offers`).insertAdjacentHTML(`beforeend`,
               `${typeData.offers.map(({name, title, price: offerPrice}) => `<div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="event-offer-${name}-1"
-              type="checkbox" name="event-offer-${name}">
-              <label class="event__offer-label" for="event-offer-${name}-1">
-                <span class="event__offer-title">${title}</span>+
+              <input class="event__offer-checkbox  visually-hidden" id="event-offer-${title}-1"
+              type="checkbox" name="event-offer-${title}">
+              <label class="event__offer-label" for="event-offer-${title}-1">
+                <span class="event__offer-title">${name}</span>+
                 €&nbsp;<span class="event__offer-price">${offerPrice}</span>
               </label>
               </div>`).join(``)}`);
@@ -198,7 +198,7 @@ export class EventEdit extends Event {
         this.getElement().querySelector(`.event__destination-description`).textContent = cityData ? cityData.description : `no description`;
         this.getElement().querySelector(`.event__photos-tape`).innerHTML = ``;
         this.getElement().querySelector(`.event__photos-tape`).insertAdjacentHTML(`beforeend`, cityData ?
-          `${cityData.photo.map((photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`).join(``)}`
+          `${cityData.pictures.map(({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`).join(``)}`
           : ``);
       });
   }

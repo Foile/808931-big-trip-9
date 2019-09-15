@@ -1,3 +1,6 @@
+import {ModelEvent} from './models/model-event';
+import {ModelOffer} from './models/model-offer';
+import {ModelDestination} from './models/model-destination';
 const Method = {
   GET: `GET`,
   POST: `POST`,
@@ -12,14 +15,24 @@ const checkStatus = (response) => {
     throw new Error(`${response.status}: ${response.statusText}`);
   }
 };
-
-const Api = class {
+const toJSON = (response) => {
+  return response.json();
+};
+export class Api {
   constructor({endPoint, authorization}) {
     this._endPoint = endPoint;
     this._authorization = authorization;
   }
 
   getEvents() {
+    return this._load({url: `points`}).then(toJSON).then(ModelEvent.parseEvents);
+  }
+
+  getOffers() {
+    return this._load({url: `offers`}).then(toJSON).then(ModelOffer.parseTypeOffers);
+  }
+  getDestinations() {
+    return this._load({url: `destinations`}).then(toJSON).then(ModelDestination.parseDestinations);
   }
 
   createEvent({Event}) {
@@ -37,8 +50,9 @@ const Api = class {
     return fetch(`${this._endPoint}/${url}`, {method, body, headers})
       .then(checkStatus)
       .catch((err) => {
+        // eslint-disable-next-line no-console
         console.error(`fetch error: ${err}`);
         throw err;
       });
   }
-};
+}

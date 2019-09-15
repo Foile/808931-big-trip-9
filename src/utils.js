@@ -56,3 +56,4 @@ export const calcPrice = (events) => {
   }));
   return totalAmount;
 };
+export const toKebab = (string) => string.split(` `).join(`-`).toLowerCase();

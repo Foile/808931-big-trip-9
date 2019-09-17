@@ -1,17 +1,18 @@
-import {render, unrender, Position} from '../utils';
+import {render, unrender, Position, toKebab} from '../utils';
 import {Event} from './trip-event';
 import {EventEdit} from './trip-event-edit-form';
-import {destinations, eventTypes} from '../data';
+import {eventTypes} from '../data';
 import moment from 'moment';
 
 export class PointController {
-  constructor(event, container, onDataChange, onChangeView, onCancel, isNew) {
+  constructor(event, container, onDataChange, onChangeView, onCancel, isNew, destinations) {
     this._event = event;
     this._container = container;
     this._onDataChange = onDataChange;
     this._onChangeView = onChangeView;
     this._eventComponent = new Event(event);
-    this._eventEditComponent = new EventEdit(event, event.type.offers);
+    this._destinations = destinations;
+    this._eventEditComponent = new EventEdit(event, this._destinations);
     this._onCancel = onCancel;
     this.init(isNew);
   }
@@ -32,14 +33,14 @@ export class PointController {
 
   _readFormData(formData) {
     const selectedEventType = eventTypes.find(({title}) => title === formData.get(`event-type`));
-    const destination = destinations.find(({name}) => name === formData.get(`event-destination`));
+    const destination = this._destinations.find(({name}) => name === formData.get(`event-destination`));
     const event = {
       type: selectedEventType ? selectedEventType : this._event.type,
       destination: destination ? destination : {name: formData.get(`event-destination`), description: ``, photo: []},
       timeStart: moment(formData.get(`event-start-time`), `DD.MM.YYYY HH:mm`),
       timeEnd: moment(formData.get(`event-end-time`), `DD.MM.YYYY HH:mm`),
       price: formData.get(`event-price`),
-      offers: this._event.type.offers.reduce(((res, offer) => formData.get(`event-offer-${offer.title}`) === `on` ? [...res, offer] : [...res]), []),
+      offers: this._event.type.offers.reduce(((res, offer) => formData.get(`event-offer-${toKebab(offer.title)}`) === `on` ? [...res, offer] : [...res]), []),
       isFavorite: formData.get(`event-favorite`) === `on`,
     };
     return event;

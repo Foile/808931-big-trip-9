@@ -36,15 +36,6 @@ export const eventTypes = [
   {title: `restaurant`, type: `activity`, emoji: `🍴`}
 ];
 
-api.getOffers().then((offersLoad)=> {
-  eventTypes.map((type) => {
-    const offer = offersLoad.find((off) => {
-      return off.type === type.title;
-    });
-    type.offers = [...offer.offers];
-  });
-});
-
 export let destinations = [];
 
 api.getDestinations().then((data) => {

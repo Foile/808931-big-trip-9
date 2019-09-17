@@ -1,10 +1,8 @@
-import {toKebab} from '../utils';
 
 export class ModelOffer {
   constructor(data) {
-    this.name = data.name;
     this.price = data.price;
-    this.title = toKebab(data.name);
+    this.title = data.name;
   }
 
   static parseOffer(data) {

@@ -4,8 +4,9 @@ import {makeFirstSymUp, calcDuration, DATE_FORMAT, TIME_FORMAT} from '../utils';
 import moment from 'moment';
 
 export class Event extends AbstractComponent {
-  constructor({type, destination, timeStart, timeEnd, price, offers, isFavorite}) {
+  constructor({id, type, destination, timeStart, timeEnd, price, offers, isFavorite}) {
     super();
+    this._id = id;
     this._type = type;
     this._destination = destination;
     this._timeStart = timeStart;

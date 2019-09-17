@@ -36,13 +36,29 @@ export class Api {
   }
 
   createEvent({event}) {
-
+    return this._load({
+      url: `events`,
+      method: Method.POST,
+      body: JSON.stringify(event),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+        .then(toJSON)
+        .then(ModelEvent.parseEvent);
   }
 
   updateEvent({id, data}) {
+    return this._load({
+      url: `events/${id}`,
+      method: Method.PUT,
+      body: JSON.stringify(data),
+      headers: new Headers({'Content-Type': `application/json`})
+    })
+      .then(toJSON)
+      .then(ModelEvent.parseTask);
   }
 
   deleteEvent({id}) {
+    return this._load({url: `events/${id}`, method: Method.DELETE});
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {

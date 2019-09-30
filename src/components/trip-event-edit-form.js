@@ -79,10 +79,10 @@ export class EventEdit extends Event {
         <label class="visually-hidden" for="event-end-time-1">
           To
         </label>
-        <input class="event__input  event__input--time" id="event-end-time-1"
+        <input class="event__input event__input--time" id="event-end-time-1"
         type="text" name="event-end-time" value="${this._timeEnd}">
       </div>
-      <div class="event__field-group  event__field-group--price">
+      <div class="event__field-group event__field-group--price">
         <label class="event__label" for="event-price-1">
           <span class="visually-hidden">Price</span>
           €
@@ -94,7 +94,7 @@ export class EventEdit extends Event {
           name="event-price"
           value="${this._price}">
       </div>
-      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+      <button class="event__save-btn btn btn--blue" type="submit">Save</button>
       <button class="event__reset-btn" type="reset">Delete</button>
       <input id="event-favorite-1" class="event__favorite-checkbox visually-hidden"
       type="checkbox" name="event-favorite" ${this._isFavorite && `checked=""`}>
@@ -135,6 +135,40 @@ export class EventEdit extends Event {
     </section>
     </form>
     </li>`;
+  }
+
+  shake() {
+    const ANIMATION_TIMEOUT = 600;
+    this._element.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this._element.style.animation = ``;
+    }, ANIMATION_TIMEOUT);
+    this._addRedFrame();
+  }
+
+  lock(action) {
+    this._removeRedFrame();
+    this._element.querySelector(`.event__save-btn`).innerHTML = action === `save` ? `Saving...` : `Save`;
+    this._element.querySelector(`.event__reset-btn`).innerHTML = action === `delete` ? `Deleting...` : `Delete`;
+    this._element.querySelector(`.event__save-btn`).disabled = true;
+    this._element.querySelector(`.event__reset-btn`).disabled = true;
+  }
+
+  unlock() {
+    this._element.querySelector(`.event__save-btn`).disabled = false;
+    this._element.querySelector(`.event__reset-btn`).disabled = false;
+    this._element.querySelector(`.event__save-btn`).innerHTML = `Save`;
+    this._element.querySelector(`.event__reset-btn`).innerHTML = `Delete`;
+  }
+
+  _removeRedFrame() {
+    this._element.style.border = `none`;
+  }
+
+  _addRedFrame() {
+    this._element.style.border = `1px double red`;
+    this._element.style.borderRadius = `18px`;
   }
 
   resetForm() {

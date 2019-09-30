@@ -71,10 +71,18 @@ export class PointController {
     this._eventEditComponent.getElement().querySelector(`.event--edit`).addEventListener(`submit`, (evt) => {
       evt.preventDefault();
       const formData = new FormData(this._eventEditComponent.getElement().querySelector(`.event--edit`));
-      const entry = this._readFormData(formData);
-      this._onDataChange(isNew ? null : this._event, entry);
-      this._activateView();
-      document.removeEventListener(`keydown`, onEscKeyDown);
+      const event = this._readFormData(formData);
+      this._eventEditComponent.lock(`save`);
+      this._onDataChange(isNew ? null : this._event, event)
+      .then(() => {
+        this._activateView();
+        document.removeEventListener(`keydown`, onEscKeyDown);
+        this._eventEditComponent.unlock();
+      })
+      .catch(() => {
+        this._eventEditComponent.shake();
+        this._eventEditComponent.unlock();
+      });
     });
 
     this._eventEditComponent.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, (evt) => {
@@ -84,7 +92,17 @@ export class PointController {
         this._onCancel();
         return;
       }
-      this._onDataChange(this._event, null);
+      this._eventEditComponent.lock(`delete`);
+      this._onDataChange(this._event, null)
+      .then(() => {
+        this._activateView();
+        document.removeEventListener(`keydown`, onEscKeyDown);
+        this._eventEditComponent.unlock();
+      })
+      .catch(() => {
+        this._eventEditComponent.shake();
+        this._eventEditComponent.unlock();
+      });
 
     });
 
@@ -96,7 +114,6 @@ export class PointController {
         unrender(this._eventEditComponent);
         this._onCancel();
       }
-
     });
 
     if (isNew) {

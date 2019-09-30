@@ -36,11 +36,11 @@ export class Event extends AbstractComponent {
     </p>
     <h4 class="visually-hidden">Offers:</h4>
     <ul class="event__selected-offers">
-    ${(this._offers.length > 0) ? Array.from(this._offers).map(({title, price: offerPrice}) => `<li class="event__offer">
+    ${(this._offers) ? Array.from(this._offers).map(({title, price: offerPrice, accepted}) => accepted ? `<li class="event__offer">
     <span class="event__offer-title">${makeFirstSymUp(title)}</span>
     &plus;
     &euro;&nbsp;<span class="event__offer-price">${offerPrice}</span>
-   </li>`).join(``) : ``}
+   </li>` : ``).join(``) : ``}
     </ul>
     <button class="event__rollup-btn" type="button">
       <span class="visually-hidden">Open event</span>

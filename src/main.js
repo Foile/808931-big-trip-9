@@ -26,7 +26,12 @@ api.getOffers().then((offersData)=> {
   const tripInfoCostElement = document.querySelector(`.trip-info__cost`);
   const tripEventsElement = document.querySelector(`.trip-events`);
   const filters = new Filters(getFilters());
-  const tripController = new TripController(events, tripEventsElement, tripInfoCostElement.querySelector(`.trip-info__cost-value`), filters, destinationsData, api);
+  const tripController = new TripController(events,
+      tripEventsElement,
+      tripInfoCostElement.querySelector(`.trip-info__cost-value`),
+      filters,
+      destinationsData,
+      api);
   const statistics = new Statistics([{name: `money`}, {name: `transport`}, {name: `time`}], events);
   statistics.hide();
 

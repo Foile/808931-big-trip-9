@@ -24,4 +24,29 @@ export class ModelEvent {
     return data.map(ModelEvent.parseEvent);
   }
 
+  static eventForUpload(data) {
+    const {
+      destination,
+      isFavorite,
+      type,
+      offers,
+      price,
+      timeStart,
+      timeEnd
+    } = data;
+    return {
+      type: type.title,
+      // eslint-disable-next-line camelcase
+      date_from: timeStart.valueOf(),
+      // eslint-disable-next-line camelcase
+      date_to: timeEnd.valueOf(),
+      destination,
+      // eslint-disable-next-line camelcase
+      is_favorite: isFavorite,
+      offers,
+      // eslint-disable-next-line camelcase
+      base_price: Number(price)
+    };
+  }
+
 }

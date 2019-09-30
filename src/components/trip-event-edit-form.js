@@ -18,8 +18,9 @@ export class EventEdit extends Event {
     this._changeOffersByType();
     this._changeDescByCity();
     const getFlatpickrConfig = (value) => {
+
       const config = {
-        defaultDate: [moment(value).valueOf()],
+        defaultDate: [moment(value).format(`DD-MM-YY hh:mm`)],
         enableTime: true,
         noCalendar: false,
         altInput: false,
@@ -40,7 +41,9 @@ export class EventEdit extends Event {
       <div class="event__type-wrapper">
         <label class="event__type event__type-btn" for="event-type-toggle-1">
           <span class="visually-hidden">Choose event type</span>
-          <img class="event__type-icon" width="17" height="17" src="${this._type.title.length > 0 ? `img/icons/${this._type.title}.png` : ``}" alt="Event type icon">
+          <img class="event__type-icon" width="17" height="17"
+          src="${this._type.title.length > 0 ? `img/icons/${this._type.title}.png` : ``}"
+          alt="${this._type.title} icon">
         </label>
         <input class="event__type-toggle visually-hidden" id="event-type-toggle-1" type="checkbox">
         <div class="event__type-list">
@@ -50,7 +53,8 @@ export class EventEdit extends Event {
       ${group}</legend>
       ${eventTypeGroups[group].reduce((acc, title) =>
     `${acc}<div class="event__type-item">
-        <input id="event-type-${title}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${title}">
+        <input id="event-type-${title}-1" class="event__type-input  visually-hidden" type="radio" name="event-type"
+        value="${title}">
         <label class="event__type-label  event__type-label--${title}" for="event-type-${title}-1">${title}</label>
         </div>\n`, ``)}
     </fieldset>`).join(`\n`)}</div>
@@ -61,7 +65,8 @@ export class EventEdit extends Event {
         </label>
         <input class="event__input  event__input--destination" id="event-destination-1"
         type="text" name="event-destination" value="${this._destination.name}" list="destination-list-1">
-        <datalist id="destination-list-1">${this._destinations.map(({name}) => `<option value="${name}"></option>`).join(``)}
+        <datalist id="destination-list-1">
+        ${this._destinations.map(({name}) => `<option value="${name}"></option>`).join(``)}
         </datalist>
       </div>
       <div class="event__field-group  event__field-group--time">
@@ -107,9 +112,9 @@ export class EventEdit extends Event {
       <section class="event__section  event__section--offers">
         <h3 class="event__section-title  event__section-title--offers">Offers</h3>
         <div class="event__available-offers">
-        ${this._type.offers ? this._type.offers.map(({title, price: offerPrice}) => `<div class="event__offer-selector">
+        ${this._offers ? this._offers.map(({title, price: offerPrice, accepted}) => `<div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${toKebab(title)}-1"
-        type="checkbox" name="event-offer-${toKebab(title)}" ${this._offers.find((offerChecked) => offerChecked.title === title) && `checked=""`}>
+        type="checkbox" name="event-offer-${toKebab(title)}" ${ accepted && `checked=""`}>
         <label class="event__offer-label" for="event-offer-${toKebab(title)}-1">
           <span class="event__offer-title">${title}</span>+
           €&nbsp;<span class="event__offer-price">${offerPrice}</span>
@@ -122,7 +127,8 @@ export class EventEdit extends Event {
         <p class="event__destination-description">${this._destination.description}</p>
         <div class="event__photos-container">
           <div class="event__photos-tape">
-          ${this._destination.pictures ? this._destination.pictures.map(({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`).join(``) : ``}
+          ${this._destination.pictures ? this._destination.pictures.map(({src, description}) => `<img class="event__photo"
+          src="${src}" alt="${description}">`).join(``) : ``}
           </div>
         </div>
       </section>
@@ -142,15 +148,16 @@ export class EventEdit extends Event {
             ({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`
         ).join(``)}`);
     this.getElement().querySelector(`.event__favorite-checkbox`).checked = this._isFavorite;
-
+    this.getElement().querySelector(`.event__input[name='event-start-time']`).value = moment(this._timeStart).format(`DD-MM-YY hh:mm`);
+    this.getElement().querySelector(`.event__input[name='event-end-time']`).value = moment(this._timeEnd).format(`DD-MM-YY hh:mm`);
     const offersClasses = this.getElement().querySelector(`.event__section--offers`).classList;
     if (this._offers.length > 0) {
       this.getElement().querySelector(`.event__section--offers`).classList.remove(`visually-hidden`);
       this.getElement().querySelector(`.event__available-offers`).innerHTML = ``;
       this.getElement().querySelector(`.event__available-offers`).insertAdjacentHTML(`beforeend`,
-          `${this._type.offers.map(({title, price: offerPrice}) => `<div class="event__offer-selector">
+          `${this._offers.map(({title, price: offerPrice, accepted}) => `<div class="event__offer-selector">
           <input class="event__offer-checkbox  visually-hidden" id="event-offer-${toKebab(title)}-1"
-          type="checkbox" name="event-offer-${toKebab(title)}" ${this._offers.find((offerChecked) => offerChecked.title === title) && `checked=""`}>
+          type="checkbox" name="event-offer-${toKebab(title)}" ${accepted && `checked=""`}>
           <label class="event__offer-label" for="event-offer-${toKebab(title)}-1">
             <span class="event__offer-title">${title}</span>+
             €&nbsp;<span class="event__offer-price">${offerPrice}</span>
@@ -172,6 +179,7 @@ export class EventEdit extends Event {
         typeItem.addEventListener(`click`, (evt) => {
           const target = evt.currentTarget;
           const typeData = eventTypes.find(({title}) => title === target.value);
+          this._offers = typeData.offers;
           if (typeData.offers.length === 0) {
             this.getElement().querySelector(`.event__section--offers`).classList.add(`visually-hidden`);
           } else {

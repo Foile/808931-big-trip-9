@@ -10,7 +10,7 @@ export class Menu extends AbstractComponent {
     return `<nav class="trip-controls__trip-tabs  trip-tabs">
   ${this._tabs.map(({name, link, active}) => `<a class="trip-tabs__btn
   ${active ? `trip-tabs__btn--active` : ``}"
-  href="${link}" data-switch="${name}">${makeFirstSymUp(name)}</a>`)}
+  href="${link}" data-switch="${name}">${makeFirstSymUp(name)}</a>`).join(``)}
   </nav>`;
   }
 }

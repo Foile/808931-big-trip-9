@@ -1,6 +1,7 @@
 import {ModelEvent} from './models/model-event';
 import {ModelOffer} from './models/model-offer';
 import {ModelDestination} from './models/model-destination';
+
 const Method = {
   GET: `GET`,
   POST: `POST`,
@@ -35,30 +36,32 @@ export class Api {
     return this._load({url: `destinations`}).then(toJSON).then(ModelDestination.parseDestinations);
   }
 
-  createEvent({event}) {
+  createEvent(event) {
     return this._load({
-      url: `events`,
+      url: `points`,
       method: Method.POST,
-      body: JSON.stringify(event),
+      body: JSON.stringify(ModelEvent.eventForUpload(event)),
       headers: new Headers({'Content-Type': `application/json`})
     })
         .then(toJSON)
         .then(ModelEvent.parseEvent);
   }
 
-  updateEvent({id, data}) {
-    return this._load({
-      url: `events/${id}`,
+  updateEvent(id, data) {
+    const uploadData = ModelEvent.eventForUpload(data);
+    return this
+    ._load({
+      url: `points/${id}`,
       method: Method.PUT,
-      body: JSON.stringify(data),
+      body: JSON.stringify(uploadData),
       headers: new Headers({'Content-Type': `application/json`})
     })
-      .then(toJSON)
-      .then(ModelEvent.parseTask);
+    .then(toJSON)
+    .then(ModelEvent.parseEvent);
   }
 
-  deleteEvent({id}) {
-    return this._load({url: `events/${id}`, method: Method.DELETE});
+  deleteEvent(id) {
+    return this._load({url: `points/${id}`, method: Method.DELETE});
   }
 
   _load({url, method = Method.GET, body = null, headers = new Headers()}) {

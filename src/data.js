@@ -1,13 +1,5 @@
-const getArrayRandom = (array, maxCount) => {
-  let result = new Set();
-  for (let i = 0; i < maxCount; i++) {
-    const rnd = Boolean(Math.round(Math.random()));
-    if (rnd) {
-      result.add(array[Math.floor(Math.random() * array.length)]);
-    }
-  }
-  return Array.from(result);
-};
+import {Api} from './api';
+const api = new Api({endPoint: `https://htmlacademy-es-9.appspot.com/big-trip`, authorization: `Basic test84848`});
 
 const eventTitles = [
   [`flight`, `transfer`],
@@ -30,52 +22,25 @@ export const eventTypeGroups = eventTitles.reduce(
     {}
 );
 
-export const offers = [
-  {title: `Add luggage`, name: `luggage`, price: 30},
-  {title: `Switch to comfort class`, name: `comfort`, price: 100},
-  {title: `Add meal`, name: `meal`, price: 15},
-  {title: `Choose seats`, name: `seats`, price: 5},
-  {title: `Travel by train`, name: `train`, price: 40}
-];
 
 export const eventTypes = [
-  {title: `flight`, type: `transfer`, offers: getArrayRandom(offers, 5), emoji: `️✈️`},
-  {title: `train`, type: `transfer`, offers: getArrayRandom(offers, 5), emoji: `🚂`},
-  {title: `ship`, type: `transfer`, offers: getArrayRandom(offers, 5), emoji: `🛳`},
-  {title: `drive`, type: `transfer`, offers: getArrayRandom(offers, 5), emoji: `🚗`},
-  {title: `transport`, type: `transfer`, offers: getArrayRandom(offers, 5), emoji: `🚊`},
-  {title: `bus`, type: `transfer`, offers: getArrayRandom(offers, 5), emoji: `🚌`},
-  {title: `taxi`, type: `transfer`, offers: getArrayRandom(offers, 5), emoji: `🚕`},
-  {title: `check-in`, type: `activity`, offers: getArrayRandom(offers, 5), emoji: `🏨`},
-  {title: `sightseeing`, type: `activity`, offers: getArrayRandom(offers, 5), emoji: `🏛`},
-  {title: `restaurant`, type: `activity`, offers: getArrayRandom(offers, 5), emoji: `🍴`}
+  {title: `flight`, type: `transfer`, emoji: `️✈️`},
+  {title: `train`, type: `transfer`, emoji: `🚂`},
+  {title: `ship`, type: `transfer`, emoji: `🛳`},
+  {title: `drive`, type: `transfer`, emoji: `🚗`},
+  {title: `transport`, type: `transfer`, emoji: `🚊`},
+  {title: `bus`, type: `transfer`, emoji: `🚌`},
+  {title: `taxi`, type: `transfer`, emoji: `🚕`},
+  {title: `check-in`, type: `activity`, emoji: `🏨`},
+  {title: `sightseeing`, type: `activity`, emoji: `🏛`},
+  {title: `restaurant`, type: `activity`, emoji: `🍴`}
 ];
 
-export const destinations = [
-  {name: `Amsterdam`, description: `Amsterdam is the largest city in the Netherlands. It is the commercial, banking, and industrial center of the country and the official capital, although the actual seat of government is The Hague.`},
-  {name: `Vienna`, description: `Vienna continues to attract visitors with its many great historic sights, fabled collections of art, glittering palaces, and exceptional musical heritage that's still carried on in concert halls and one of the world's great opera houses.`},
-  {name: `Geneva`, description: `Geneva is the second-most populous city in Switzerland (after Zürich) and the most populous city of Romandy, the French-speaking part of Switzerland.`},
-  {name: `Oslo`, description: `Captivating landmarks like the Opera House, the Astrup Fearnley Museum and Barcode are changing the face of the city, and Oslo maintains its refreshing closeness to nature that few other capitals can match.`},
-  {name: `London`, description: `London is the capital of Great Britain`},
-  {name: `Praha`, description: `Prague is one of the most beautiful cities in Europe in terms of its setting on both banks of the Vltava River, its townscape of burgher houses and palaces punctuated by towers, and its individual buildings.`},
-];
+export let destinations = [];
 
-destinations.map((destination) => {
-  destination.photo = Array(Math.floor(Math.random() * 10)).fill().map(() => `http://picsum.photos/300/150?r=${Math.random()}`);
+api.getDestinations().then((data) => {
+  destinations = data;
 });
-
-export const getEvent = () => {
-  let event = {
-    type: eventTypes[Math.floor(Math.random() * eventTypes.length)],
-    destination: destinations[Math.floor(Math.random() * destinations.length)],
-    timeStart: Date.now() + 1 + Math.ceil(Math.random() * 3600) * 1000 * 24 * 7,
-    timeEnd: Date.now() + 1 + Math.ceil(Math.random() * 3600) * 1000 * 24 * 7,
-    price: Math.floor(Math.random() * 100 + 1),
-    isFavorite: Boolean(Math.round(Math.random()))
-  };
-  event.offers = getArrayRandom(event.type.offers, 2);
-  return event;
-};
 
 export const getFilters = () => [
   {title: `Everything`, callback: () => true},

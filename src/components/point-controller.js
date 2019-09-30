@@ -1,17 +1,18 @@
-import {render, unrender, Position} from '../utils';
+import {render, unrender, Position, toKebab} from '../utils';
 import {Event} from './trip-event';
 import {EventEdit} from './trip-event-edit-form';
-import {offers as offersStack, destinations, eventTypes} from '../data';
+import {eventTypes} from '../data';
 import moment from 'moment';
 
 export class PointController {
-  constructor(event, container, onDataChange, onChangeView, onCancel, isNew) {
+  constructor(event, container, onDataChange, onChangeView, onCancel, isNew, destinations) {
     this._event = event;
     this._container = container;
     this._onDataChange = onDataChange;
     this._onChangeView = onChangeView;
     this._eventComponent = new Event(event);
-    this._eventEditComponent = new EventEdit(event, offersStack);
+    this._destinations = destinations;
+    this._eventEditComponent = new EventEdit(event, destinations);
     this._onCancel = onCancel;
     this.init(isNew);
   }
@@ -32,14 +33,26 @@ export class PointController {
 
   _readFormData(formData) {
     const selectedEventType = eventTypes.find(({title}) => title === formData.get(`event-type`));
-    const destination = destinations.find(({name}) => name === formData.get(`event-destination`));
+    const type = selectedEventType ? selectedEventType : this._event.type;
+    const destination = this._destinations.find(({name}) => name === formData.get(`event-destination`));
+
+    const offers = Array.from(new Set([...this._event.offers, ...type.offers])).reduce((res, offer) => {
+      const accepted = formData.get(`event-offer-${toKebab(offer.title)}`) === `on`;
+      offer.accepted = accepted;
+      if (!res.find((off) => off.title === offer.title)) {
+        return [...res, offer];
+      } else {
+        return [...res];
+      }
+    }, []);
     const event = {
-      type: selectedEventType ? selectedEventType : this._event.type,
+      id: this._event._id,
+      type,
       destination: destination ? destination : {name: formData.get(`event-destination`), description: ``, photo: []},
-      timeStart: moment(formData.get(`event-start-time`), `DD.MM.YYYY HH:mm`),
-      timeEnd: moment(formData.get(`event-end-time`), `DD.MM.YYYY HH:mm`),
+      timeStart: moment(formData.get(`event-start-time`), `DD.MM.YY HH:mm`),
+      timeEnd: moment(formData.get(`event-end-time`), `DD.MM.YY HH:mm`),
       price: formData.get(`event-price`),
-      offers: offersStack.reduce(((res, offer) => formData.get(`event-offer-${offer.name}`) === `on` ? [...res, offer] : [...res]), []),
+      offers,
       isFavorite: formData.get(`event-favorite`) === `on`,
     };
     return event;

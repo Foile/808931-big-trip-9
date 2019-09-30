@@ -42,7 +42,13 @@ export class TripController {
 
   _renderEvents(container, events) {
     events.filter(this._currentFilter.callback).forEach((event) => {
-      const point = new PointController(event, container, this._onDataChange, this._onChangeView, null, false, this._destinations);
+      const point = new PointController(event,
+          container,
+          this._onDataChange,
+          this._onChangeView,
+          null,
+          false,
+          this._destinations);
       this._views.push(point._activateView.bind(point));
     });
     this._totalPriceElement.textContent = calcPrice(this._events);
@@ -71,7 +77,9 @@ export class TripController {
       render(tripDays.getElement(), dayElement);
       this._eventContainer = new EventList();
       render(dayElement, this._eventContainer.getElement());
-      const dayEvents = this._events.filter(({timeStart}) => new Date(day).toLocaleDateString() === new Date(timeStart).toLocaleDateString());
+      const dayEvents = this._events.filter(
+          ({timeStart}) => new Date(day).toLocaleDateString() === new Date(timeStart).toLocaleDateString()
+      );
       this._renderEvents(this._eventContainer, dayEvents);
     });
   }
@@ -122,25 +130,27 @@ export class TripController {
   _onDataChange(oldData, newData) {
     const index = this._events.findIndex((event) => event === oldData);
     if (newData === null) {
-      this._api.deleteEvent(oldData.id)
+      return this._api.deleteEvent(oldData.id)
       .then(() => {
         this._events = [...this._events.slice(0, index), ...this._events.slice(index + 1)];
+      }).then(()=>{
         this.update();
       });
     } else if (oldData === null) {
       this._addEventController = null;
-      this._api.createEvent(newData)
+      return this._api.createEvent(newData)
       .then((event) => {
         this._events = [event, ...this._events];
+      }).then(()=>{
         this.update();
       });
     } else {
-      this._api.updateEvent(oldData.id, newData)
+      return this._api.updateEvent(oldData.id, newData)
       .then((event) => {
         this._events[index] = event;
+      }).then(()=>{
         this.update();
-      }
-      );
+      });
     }
   }
 
@@ -171,6 +181,12 @@ export class TripController {
     this._eventContainer = new EventList();
     render(tripDay.getElement(), this._eventContainer.getElement(), Position.BEFOREEND);
     this._addEventContainer = tripDay;
-    this._addEventController = new PointController(event, this._eventContainer, this._onDataChange, this._onChangeView, this._onCancel, true, this._destinations);
+    this._addEventController = new PointController(event,
+        this._eventContainer,
+        this._onDataChange,
+        this._onChangeView,
+        this._onCancel,
+        true,
+        this._destinations);
   }
 }

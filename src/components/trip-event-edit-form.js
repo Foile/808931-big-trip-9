@@ -1,4 +1,4 @@
-import {eventTypeGroups, eventTypes} from '../data';
+import {eventTypeGroups} from '../data';
 import {makeFirstSymUp} from '../utils';
 import {Event} from './trip-event';
 import moment from 'moment';
@@ -12,9 +12,10 @@ const removeFlatpickr = (element) => {
 };
 
 export class EventEdit extends Event {
-  constructor(event, destinations) {
+  constructor(event, destinations, eventTypes) {
     super(event);
     this._destinations = destinations;
+    this._eventTypes = eventTypes;
     this._changeOffersByType();
     this._changeDescByCity();
     const getFlatpickrConfig = (value) => {
@@ -212,7 +213,7 @@ export class EventEdit extends Event {
       .forEach((typeItem) => {
         typeItem.addEventListener(`click`, (evt) => {
           const target = evt.currentTarget;
-          const typeData = eventTypes.find(({title}) => title === target.value);
+          const typeData = this._eventTypes.find(({title}) => title === target.value);
           this._offers = typeData.offers;
           if (typeData.offers.length === 0) {
             this.getElement().querySelector(`.event__section--offers`).classList.add(`visually-hidden`);

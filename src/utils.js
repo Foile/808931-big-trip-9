@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 export const Position = {
   AFTERBEGIN: `afterbegin`,
   BEFOREEND: `beforeend`
@@ -31,8 +33,7 @@ export const unrender = (Component) => {
 };
 export const makeFirstSymUp = (string) => `${string.length > 0 ? string[0].toUpperCase() + string.slice(1) : ``}`;
 
-export const calcDuration = (timeStart, timeEnd) => {
-  let diff = Math.abs(timeEnd - timeStart) / 1000;
+const getDiffDuration = (diff) => {
   let result = {};
   let partTime = {
     day: 86400,
@@ -44,7 +45,11 @@ export const calcDuration = (timeStart, timeEnd) => {
     diff -= result[key] * partTime[key];
   });
   return Object.keys(result).map((cur) => result[cur] > 0 ? `${result[cur]} ${cur[0].toUpperCase()} ` : ``).join(` `);
-};
+}
+
+export const calcDuration = (timeStart, timeEnd) => {
+  return getDiffDuration(moment(timeEnd).diff(timeStart, `second`));
+}
 
 export const calcPrice = (events) => {
   let totalAmount = 0;

@@ -1,18 +1,18 @@
 import {render, unrender, Position, toKebab} from '../utils';
 import {Event} from './trip-event';
 import {EventEdit} from './trip-event-edit-form';
-import {eventTypes} from '../data';
 import moment from 'moment';
 
 export class PointController {
-  constructor(event, container, onDataChange, onChangeView, onCancel, isNew, destinations) {
+  constructor(event, container, onDataChange, onChangeView, onCancel, isNew, destinations, eventTypes) {
     this._event = event;
     this._container = container;
     this._onDataChange = onDataChange;
     this._onChangeView = onChangeView;
     this._eventComponent = new Event(event);
     this._destinations = destinations;
-    this._eventEditComponent = new EventEdit(event, destinations);
+    this._eventTypes = eventTypes;
+    this._eventEditComponent = new EventEdit(event, destinations, eventTypes);
     this._onCancel = onCancel;
     this.init(isNew);
   }
@@ -32,7 +32,7 @@ export class PointController {
   }
 
   _readFormData(formData) {
-    const selectedEventType = eventTypes.find(({title}) => title === formData.get(`event-type`));
+    const selectedEventType = this._eventTypes.find(({title}) => title === formData.get(`event-type`));
     const type = selectedEventType ? selectedEventType : this._event.type;
     const destination = this._destinations.find(({name}) => name === formData.get(`event-destination`));
 
@@ -46,7 +46,7 @@ export class PointController {
       }
     }, []);
     const event = {
-      id: this._event._id,
+      id: this._event.id,
       type,
       destination: destination ? destination : {name: formData.get(`event-destination`), description: ``, photo: []},
       timeStart: moment(formData.get(`event-start-time`), `DD.MM.YY HH:mm`),

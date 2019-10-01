@@ -4,11 +4,11 @@ import {render, unrender, calcPrice, Position} from '../utils';
 import {TripDayList} from './trip-day-list';
 import {Sort} from './sort';
 import {PointController} from './point-controller';
-import {getFilters, eventTypes} from '../data';
+import {getFilters} from '../data';
 
 
 export class TripController {
-  constructor(events, container, totalPriceElement, filters, destinations, api) {
+  constructor(events, container, totalPriceElement, filters, destinations, eventTypes, api) {
     this._events = events;
     this._container = container;
     this._sort = new Sort();
@@ -24,6 +24,7 @@ export class TripController {
     this._currentFilter = getFilters()[0];
     this._currentSort = `day`;
     this._destinations = destinations;
+    this._eventTypes = eventTypes;
     this._api = api;
   }
 
@@ -48,7 +49,8 @@ export class TripController {
           this._onChangeView,
           null,
           false,
-          this._destinations);
+          this._destinations,
+          this._eventTypes);
       this._views.push(point._activateView.bind(point));
     });
     this._totalPriceElement.textContent = calcPrice(this._events);
@@ -168,13 +170,13 @@ export class TripController {
       return;
     }
     let event = {
-      type: eventTypes[0],
+      type: this._eventTypes[0],
       destination: this._destinations[0],
       timeStart: Date.now(),
       timeEnd: Date.now(),
       price: 0,
       isFavorite: false,
-      offers: eventTypes[0].offers
+      offers: this._eventTypes[0].offers
     };
     const tripDay = new TripDay();
     render(this._days.getElement(), tripDay.getElement(), Position.AFTERBEGIN);
@@ -187,6 +189,7 @@ export class TripController {
         this._onChangeView,
         this._onCancel,
         true,
-        this._destinations);
+        this._destinations,
+        this._eventTypes);
   }
 }

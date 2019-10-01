@@ -15,13 +15,15 @@ const tripInfo = document.querySelector(`.trip-main__trip-info`);
 const api = new Api({endPoint: `https://htmlacademy-es-9.appspot.com/big-trip`, authorization: `Basic test84848`});
 
 api.getOffers().then((offersData)=> {
-  eventTypes.map((type) => {
+  const types =  eventTypes;
+  types.map((type) => {
     const typeOffers = offersData.find((offer) => {
       return offer.type === type.title;
     });
     type.offers = [...typeOffers.offers];
   });
-}).then(() => api.getDestinations().then((destinationsData) => api.getEvents().then((events) => {
+  return types;
+}).then((extendedEventTypes) => api.getDestinations().then((destinationsData) => api.getEvents().then((events) => {
   render(tripInfo, new TripInfo(events).getElement(), Position.AFTERBEGIN);
   const tripInfoCostElement = document.querySelector(`.trip-info__cost`);
   const tripEventsElement = document.querySelector(`.trip-events`);
@@ -31,6 +33,7 @@ api.getOffers().then((offersData)=> {
       tripInfoCostElement.querySelector(`.trip-info__cost-value`),
       filters,
       destinationsData,
+      extendedEventTypes,
       api);
   const statistics = new Statistics([{name: `money`}, {name: `transport`}, {name: `time`}], events);
   statistics.hide();

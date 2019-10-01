@@ -24,7 +24,7 @@ export const eventTypeGroups = eventTitles.reduce(
 
 
 export const eventTypes = [
-  {title: `flight`, type: `transfer`, emoji: `️✈️`},
+  {title: `flight`, type: `transfer`, emoji: `✈️`},
   {title: `train`, type: `transfer`, emoji: `🚂`},
   {title: `ship`, type: `transfer`, emoji: `🛳`},
   {title: `drive`, type: `transfer`, emoji: `🚗`},
@@ -35,12 +35,6 @@ export const eventTypes = [
   {title: `sightseeing`, type: `activity`, emoji: `🏛`},
   {title: `restaurant`, type: `activity`, emoji: `🍴`}
 ];
-
-export let destinations = [];
-
-api.getDestinations().then((data) => {
-  destinations = data;
-});
 
 export const getFilters = () => [
   {title: `Everything`, callback: () => true},

@@ -1,6 +1,6 @@
 import {AbstractComponent} from './abstract-component';
-// import {_} from 'lodash';
 import {Chart} from 'chart.js';
+import ChartDataLabels from "chartjs-plugin-datalabels";
 import {createElement} from '../utils';
 import moment from 'moment';
 import {eventTypes} from '../data';
@@ -73,16 +73,18 @@ export class Statistics extends AbstractComponent {
     let obj = new Map();
     events.forEach(({type, timeStart, timeEnd}) => {
       const title = this.getChartTitle(type.title);
-      const time = Math.abs(moment(timeEnd).diff(moment(timeStart)));
+      const time = Math.abs(moment(timeEnd).diff(moment(timeStart), `hour`));
       const cnt = obj.has(title) ? obj.get(title) : 0;
       obj.set(title, cnt + time);
     });
-    return {labels: [...obj.keys()], data: [...obj.values()]};
+    const data = [...obj.values()];
+    return {labels: [...obj.keys()], data};
   }
 
   configChart({labels, data}, title) {
     return {
       type: `horizontalBar`,
+      plugins: [ChartDataLabels],
       data: {
         labels,
         datasets: [{
@@ -95,8 +97,20 @@ export class Statistics extends AbstractComponent {
       options: {
         plugins: {
           datalabels: {
-            display: true
-          },
+            display: true,
+            anchor: `end`,
+            align: `start`,
+            padding: 5,
+            formatter(value) {
+              if (title === `transport`) {
+                return `${value}x`;
+              } else if (title === `time spent`) {
+                return `${value}H`;
+              }
+
+              return `€ ${value}`;
+            }
+          }
         },
         title: {
           display: true,

@@ -21,12 +21,12 @@ export class EventEdit extends Event {
     const getFlatpickrConfig = (value) => {
 
       const config = {
-        defaultDate: [moment(value).format(`DD-MM-YY hh:mm`)],
+        defaultDate: [moment(value).format(`DD.MM.YY hh:mm`)],
         enableTime: true,
         noCalendar: false,
         altInput: false,
         altFormat: `h:i`,
-        dateFormat: `d-m-y h:i`,
+        dateFormat: `d.m.y h:i`,
       };
       return config;
     };
@@ -110,9 +110,9 @@ export class EventEdit extends Event {
       </button>
     </header>
     <section class="event__details">
-      <section class="event__section  event__section--offers">
-        <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-        <div class="event__available-offers">
+      <section class="event__section  event__section--offers ${(this._offers && this._offers.length > 0) ? `` : `visually-hidden`}">
+      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+      <div class="event__available-offers">
         ${this._offers ? this._offers.map(({title, price: offerPrice, accepted}) => `<div class="event__offer-selector">
         <input class="event__offer-checkbox  visually-hidden" id="event-offer-${toKebab(title)}-1"
         type="checkbox" name="event-offer-${toKebab(title)}" ${ accepted && `checked=""`}>
@@ -121,10 +121,10 @@ export class EventEdit extends Event {
           €&nbsp;<span class="event__offer-price">${offerPrice}</span>
         </label>
       </div>`).join(``) : ``}
-        </div>
+      </div>
       </section>
-      <section class="event__section  event__section--destination">
-        <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+      <section class="event__section event__section--destination ${(this._destination) ? `` : `visually-hidden`}">
+        <h3 class="event__section-title event__section-title--destination">Destination</h3>
         <p class="event__destination-description">${this._destination.description}</p>
         <div class="event__photos-container">
           <div class="event__photos-tape">
@@ -176,15 +176,18 @@ export class EventEdit extends Event {
     this.getElement().querySelector(`.event--edit`).reset();
     this.getElement().querySelector(`.event__type-icon`).src = `img/icons/${this._type.title}.png`;
     this.getElement().querySelector(`.event__type-output`).textContent = `${makeFirstSymUp(this._type.title)} ${this._type.type === `activity` ? `in` : `to`}`;
-    this.getElement().querySelector(`.event__destination-description`).textContent = `${this._destination.description}`;
-    this.getElement().querySelector(`.event__photos-tape`).innerHTML = ``;
-    this.getElement().querySelector(`.event__photos-tape`).insertAdjacentHTML(`beforeend`,
-        `${this._destination.pictures.map(
-            ({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`
-        ).join(``)}`);
+    if (this._destination) {
+      this.getElement().querySelector(`.event__section--destination`).classList.remove(`visually-hidden`);
+      this.getElement().querySelector(`.event__destination-description`).textContent = `${this._destination.description}`;
+      this.getElement().querySelector(`.event__photos-tape`).innerHTML = ``;
+      this.getElement().querySelector(`.event__photos-tape`).insertAdjacentHTML(`beforeend`,
+          `${this._destination.pictures.map(
+              ({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`
+          ).join(``)}`);
+    }
     this.getElement().querySelector(`.event__favorite-checkbox`).checked = this._isFavorite;
-    this.getElement().querySelector(`.event__input[name='event-start-time']`).value = moment(this._timeStart).format(`DD-MM-YY hh:mm`);
-    this.getElement().querySelector(`.event__input[name='event-end-time']`).value = moment(this._timeEnd).format(`DD-MM-YY hh:mm`);
+    this.getElement().querySelector(`.event__input[name='event-start-time']`).value = moment(this._timeStart).format(`DD.MM.YY hh:mm`);
+    this.getElement().querySelector(`.event__input[name='event-end-time']`).value = moment(this._timeEnd).format(`DD.MM.YY hh:mm`);
     const offersClasses = this.getElement().querySelector(`.event__section--offers`).classList;
     if (this._offers.length > 0) {
       this.getElement().querySelector(`.event__section--offers`).classList.remove(`visually-hidden`);
@@ -244,11 +247,16 @@ export class EventEdit extends Event {
       .addEventListener(`change`, (evt) => {
         const target = evt.currentTarget;
         const cityData = this._destinations.find(({name}) => name === target.value);
-        this.getElement().querySelector(`.event__destination-description`).textContent = cityData ? cityData.description : `no description`;
-        this.getElement().querySelector(`.event__photos-tape`).innerHTML = ``;
-        this.getElement().querySelector(`.event__photos-tape`).insertAdjacentHTML(`beforeend`, cityData ?
-          `${cityData.pictures.map(({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`).join(``)}`
-          : ``);
+        if (!cityData) {
+          this.getElement().querySelector(`.event__section--destination`).classList.add(`visually-hidden`);
+        } else {
+          this.getElement().querySelector(`.event__section--destination`).classList.remove(`visually-hidden`);
+          this.getElement().querySelector(`.event__destination-description`).textContent = cityData.description;
+          this.getElement().querySelector(`.event__photos-tape`).innerHTML = ``;
+          this.getElement().querySelector(`.event__photos-tape`).insertAdjacentHTML(`beforeend`, cityData ?
+            `${cityData.pictures.map(({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`).join(``)}`
+            : ``);
+        }
       });
   }
 

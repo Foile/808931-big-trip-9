@@ -2,6 +2,7 @@ import {render, unrender, Position, toKebab} from '../utils';
 import {Event} from './trip-event';
 import {EventEdit} from './trip-event-edit-form';
 import moment from 'moment';
+import DOMpurify from 'dompurify';
 
 export class PointController {
   constructor(event, container, onDataChange, onChangeView, onCancel, isNew, destinations, eventTypes) {
@@ -32,9 +33,9 @@ export class PointController {
   }
 
   _readFormData(formData) {
-    const selectedEventType = this._eventTypes.find(({title}) => title === formData.get(`event-type`));
+    const selectedEventType = this._eventTypes.find(({title}) => title === DOMpurify.sanitize(formData.get(`event-type`)));
     const type = selectedEventType ? selectedEventType : this._event.type;
-    const destination = this._destinations.find(({name}) => name === formData.get(`event-destination`));
+    const destination = this._destinations.find(({name}) => name === DOMpurify.sanitize(formData.get(`event-destination`)));
 
     const offers = Array.from(new Set([...this._event.offers, ...type.offers])).reduce((res, offer) => {
       const accepted = formData.get(`event-offer-${toKebab(offer.title)}`) === `on`;

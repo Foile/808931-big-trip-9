@@ -15,7 +15,7 @@ const tripInfo = document.querySelector(`.trip-main__trip-info`);
 const api = new Api({endPoint: `https://htmlacademy-es-9.appspot.com/big-trip`, authorization: `Basic test84848`});
 
 api.getOffers().then((offersData)=> {
-  const types =  eventTypes;
+  const types = eventTypes;
   types.map((type) => {
     const typeOffers = offersData.find((offer) => {
       return offer.type === type.title;

@@ -1,14 +1,15 @@
 import {eventTypes} from '../data';
+import DOMpurify from 'dompurify';
 
 export class ModelEvent {
   constructor(data) {
-    this.id = data.id;
-    this.destination = data.destination;
-    this.timeStart = data.date_from;
-    this.timeEnd = data.date_to;
-    this.price = data.base_price;
-    this.isFavorite = data.is_favorite;
-    this.type = this.findEventType(data.type);
+    this.id = DOMpurify.sanitize(data[`id`]);
+    this.destination = data[`destination`];
+    this.timeStart = data[`date_from`];
+    this.timeEnd = data[`date_to`];
+    this.price = DOMpurify.sanitize(data[`base_price`]);
+    this.isFavorite = DOMpurify.sanitize(data[`is_favorite`]);
+    this.type = this.findEventType(DOMpurify.sanitize(data[`type`]));
     this.offers = data.offers;
   }
 

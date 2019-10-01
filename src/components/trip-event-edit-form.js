@@ -168,7 +168,7 @@ export class EventEdit extends Event {
   }
 
   _addRedFrame() {
-    this._element.style.border = `1px double red`;
+    this._element.style.border = `1px dotted red`;
     this._element.style.borderRadius = `18px`;
   }
 

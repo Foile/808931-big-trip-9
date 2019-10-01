@@ -1,6 +1,3 @@
-import {Api} from './api';
-const api = new Api({endPoint: `https://htmlacademy-es-9.appspot.com/big-trip`, authorization: `Basic test84848`});
-
 const eventTitles = [
   [`flight`, `transfer`],
   [`train`, `transfer`],
@@ -21,7 +18,6 @@ export const eventTypeGroups = eventTitles.reduce(
       }),
     {}
 );
-
 
 export const eventTypes = [
   {title: `flight`, type: `transfer`, emoji: `✈️`},
@@ -52,4 +48,3 @@ export const calcFilters = (events) => {
   }
   return result;
 };
-

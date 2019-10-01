@@ -45,11 +45,11 @@ const getDiffDuration = (diff) => {
     diff -= result[key] * partTime[key];
   });
   return Object.keys(result).map((cur) => result[cur] > 0 ? `${result[cur]} ${cur[0].toUpperCase()} ` : ``).join(` `);
-}
+};
 
 export const calcDuration = (timeStart, timeEnd) => {
   return getDiffDuration(moment(timeEnd).diff(timeStart, `second`));
-}
+};
 
 export const calcPrice = (events) => {
   let totalAmount = 0;

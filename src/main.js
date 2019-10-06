@@ -10,9 +10,7 @@ const tripInfo = document.querySelector(`.trip-main__trip-info`);
 const tripInfoElement = document.querySelector(`.trip-main__trip-controls`);
 const tripInfoCostElement = document.querySelector(`.trip-info__cost`).querySelector(`.trip-info__cost-value`);
 const api = new Api({endPoint: `https://htmlacademy-es-9.appspot.com/big-trip`, authorization: `Basic test84848`});
-
-const menu = new Menu([{name: `table`, link: `#`, active: true}, {name: `stats`, link: `#`}]);
-render(tripInfoElement, menu.getElement());
+const addNewPointBtn = document.querySelector(`.trip-main__event-add-btn`);
 
 const extendEventTypes = (offersData)=> {
   const types = eventTypes;
@@ -44,29 +42,8 @@ Promise.all([
   const statistics = new Statistics([{name: `money`}, {name: `transport`}, {name: `time`}], events);
   statistics.hide();
 
-  const menuOnClick = (evt) => {
-    evt.preventDefault();
-    const target = evt.target;
-    if (target.tagName.toLowerCase() !== `a`) {
-      return;
-    }
-    target.classList.add(`trip-tabs__btn--active`);
-    if (target.previousElementSibling) {
-      target.previousElementSibling.classList.remove(`trip-tabs__btn--active`);
-    } else {
-      target.nextElementSibling.classList.remove(`trip-tabs__btn--active`);
-    }
-    switch (target.dataset.switch) {
-      case `table`:
-        statistics.hide();
-        tripController.show();
-        break;
-      case `stats`:
-        tripController.hide();
-        statistics.show();
-        break;
-    }
-  };
+  const menu = new Menu(statistics, tripController, [{name: `table`, link: `#`, active: true}, {name: `stats`, link: `#`}]);
+  render(tripInfoElement, menu.getElement());
 
   const newPointOnClick = () => {
     menu.getElement().querySelector(`a[data-switch="table"]`).classList.add(`trip-tabs__btn--active`);
@@ -75,11 +52,9 @@ Promise.all([
     tripController.show();
     tripController.createEvent();
   };
-
-  const addNewPointBtn = document.querySelector(`.trip-main__event-add-btn`);
-  const tripControlsElement = document.querySelector(`.trip-main__trip-controls`);
-  menu.getElement().addEventListener(`click`, menuOnClick);
   addNewPointBtn.addEventListener(`click`, newPointOnClick);
+
+  const tripControlsElement = document.querySelector(`.trip-main__trip-controls`);
   render(tripControlsElement, filters.getElement());
   render(tripEventsElement.parentNode, statistics.getElement());
   tripController.init();

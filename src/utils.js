@@ -51,14 +51,13 @@ export const calcDuration = (timeStart, timeEnd) => {
   return getDiffDuration(moment(timeEnd).diff(timeStart, `second`));
 };
 
-export const calcPrice = (events) => {
-  let totalAmount = 0;
-  events.map(((event) => {
-    totalAmount += event ? Number(event.price) : 0;
-    event.offers.map((offer) => {
-      totalAmount += offer ? Number(offer.price) : 0;
-    });
-  }));
-  return totalAmount;
-};
+export const calcPrice = (events) => events.reduce((res, event) => {
+  res += event ? Number(event.price) +
+  event.offers.reduce((acc, offer) => {
+    acc += offer ? Number(offer.price) : 0;
+    return acc;
+  }, 0) : 0;
+  return res;
+}, 0);
+
 export const toKebab = (string) => string.split(` `).join(`-`).toLowerCase();

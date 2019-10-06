@@ -7,7 +7,7 @@ export class ModelEvent {
     this.destination = data[`destination`];
     this.timeStart = data[`date_from`];
     this.timeEnd = data[`date_to`];
-    this.price = DOMpurify.sanitize(data[`base_price`]);
+    this.price = Number(data[`base_price`]);
     this.isFavorite = DOMpurify.sanitize(data[`is_favorite`]);
     this.type = this.findEventType(DOMpurify.sanitize(data[`type`]));
     this.offers = data.offers;

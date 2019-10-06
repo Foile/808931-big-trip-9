@@ -1,6 +1,6 @@
 import {render, unrender, Position, toKebab} from '../utils';
-import {Event} from './trip-event';
-import {EventEdit} from './trip-event-edit-form';
+import {Event} from '../components/trip-event';
+import {EventEdit} from '../components/trip-event-edit-form';
 import moment from 'moment';
 import DOMpurify from 'dompurify';
 
@@ -66,12 +66,15 @@ export class PointController {
         document.removeEventListener(`keydown`, onEscKeyDown);
       }
     };
-    this._eventComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+    const rollupBtn = this._eventComponent.getElement().querySelector(`.event__rollup-btn`);
+    rollupBtn.addEventListener(`click`, () => {
       this._activateEdit(); document.addEventListener(`keydown`, onEscKeyDown);
     });
-    this._eventEditComponent.getElement().querySelector(`.event--edit`).addEventListener(`submit`, (evt) => {
+
+    const editForm = this._eventEditComponent.getElement().querySelector(`.event--edit`);
+    editForm.addEventListener(`submit`, (evt) => {
       evt.preventDefault();
-      const formData = new FormData(this._eventEditComponent.getElement().querySelector(`.event--edit`));
+      const formData = new FormData(editForm);
       const event = this._readFormData(formData);
       this._eventEditComponent.lock(`save`);
       this._onDataChange(isNew ? null : this._event, event)
@@ -86,7 +89,8 @@ export class PointController {
       });
     });
 
-    this._eventEditComponent.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, (evt) => {
+    const resetBtn = this._eventEditComponent.getElement().querySelector(`.event__reset-btn`);
+    resetBtn.addEventListener(`click`, (evt) => {
       evt.preventDefault();
       if (isNew) {
         unrender(this._eventEditComponent);
@@ -107,7 +111,8 @@ export class PointController {
 
     });
 
-    this._eventEditComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
+    const eventRollupBtn = this._eventEditComponent.getElement().querySelector(`.event__rollup-btn`);
+    eventRollupBtn.addEventListener(`click`, () => {
       if (!isNew) {
         this._activateView();
         document.addEventListener(`keydown`, onEscKeyDown);

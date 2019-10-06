@@ -3,6 +3,8 @@ import {AbstractComponent} from './abstract-component';
 import {makeFirstSymUp, calcDuration, DATE_FORMAT, TIME_FORMAT} from '../utils';
 import moment from 'moment';
 
+const MAX_OFFERS_SHOW = 3;
+
 export class Event extends AbstractComponent {
   constructor({id, type, destination, timeStart, timeEnd, price, offers, isFavorite}) {
     super();
@@ -19,14 +21,25 @@ export class Event extends AbstractComponent {
     return `<li class="trip-events__item">
   <div class="event">
     <div class="event__type">
-      <img class="event__type-icon" width="42" height="42" src="${this._type.title.length > 0 ? `img/icons/${this._type.title}.png` : ``}" alt="Event type icon">
+      <img
+        class="event__type-icon"
+        width="42"
+        height="42"
+        src="${this._type.title.length > 0 ? `img/icons/${this._type.title}.png` : ``}"
+        alt="Event type icon">
     </div>
     <h3 class="event__title">${makeFirstSymUp(this._type.title)} ${this._type.type === `activity` ? `in` : `to`} ${this._destination.name}</h3>
     <div class="event__schedule">
       <p class="event__time">
-        <time class="event__start-time" datetime="${moment(this._timeStart).format(DATE_FORMAT)}">${moment(this._timeStart).format(TIME_FORMAT)}</time>
+        <time
+          class="event__start-time"
+          datetime="${moment(this._timeStart).format(DATE_FORMAT)}">${moment(this._timeStart).format(TIME_FORMAT)}
+        </time>
         &mdash;
-        <time class="event__end-time" datetime="${moment(this._timeEnd).format(DATE_FORMAT)}">${moment(this._timeEnd).format(TIME_FORMAT)}</time>
+        <time
+          class="event__end-time"
+          datetime="${moment(this._timeEnd).format(DATE_FORMAT)}">${moment(this._timeEnd).format(TIME_FORMAT)}
+        </time>
       </p>
       <p class="event__duration">${calcDuration(this._timeStart, this._timeEnd)}</p>
     </div>
@@ -40,7 +53,7 @@ export class Event extends AbstractComponent {
     <span class="event__offer-title">${makeFirstSymUp(title)}</span>
     &plus;
     &euro;&nbsp;<span class="event__offer-price">${offerPrice}</span>
-   </li>` : ``).slice(0, 3).join(``) : ``}
+   </li>` : ``).slice(0, MAX_OFFERS_SHOW).join(``) : ``}
     </ul>
     <button class="event__rollup-btn" type="button">
       <span class="visually-hidden">Open event</span>

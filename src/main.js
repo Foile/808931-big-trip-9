@@ -3,36 +3,44 @@ import {Filters} from './components/filters';
 import {TripInfo} from './components/trip-info';
 import {getFilters, eventTypes} from './data';
 import {render, Position} from './utils';
-import {TripController} from './components/trip-controller';
+import {TripController} from './controllers/trip-controller';
 import {Statistics} from './components/statistics';
 import {Api} from './api';
 
 const tripInfoElement = document.querySelector(`.trip-main__trip-controls`);
+const tripInfoCostElement = document.querySelector(`.trip-info__cost`).querySelector(`.trip-info__cost-value`);
+
 const menu = new Menu([{name: `table`, link: `#`, active: true}, {name: `stats`, link: `#`}]);
 render(tripInfoElement, menu.getElement());
 const tripInfo = document.querySelector(`.trip-main__trip-info`);
 
 const api = new Api({endPoint: `https://htmlacademy-es-9.appspot.com/big-trip`, authorization: `Basic test84848`});
 
-api.getOffers().then((offersData)=> {
+const extendEventTypes = (offersData)=> {
   const types = eventTypes;
   types.map((type) => {
     const typeOffers = offersData.find((offer) => {
       return offer.type === type.title;
     });
-    type.offers = [...typeOffers.offers];
+    type.offers = typeOffers.offers;
   });
   return types;
-}).then((extendedEventTypes) => api.getDestinations().then((destinationsData) => api.getEvents().then((events) => {
+};
+
+Promise.all([
+  api.getOffers(),
+  api.getDestinations(),
+  api.getEvents()
+]).then(([offers, destinations, events]) => {
+  const extendedEventTypes = extendEventTypes(offers);
   render(tripInfo, new TripInfo(events).getElement(), Position.AFTERBEGIN);
-  const tripInfoCostElement = document.querySelector(`.trip-info__cost`);
   const tripEventsElement = document.querySelector(`.trip-events`);
   const filters = new Filters(getFilters());
   const tripController = new TripController(events,
       tripEventsElement,
-      tripInfoCostElement.querySelector(`.trip-info__cost-value`),
+      tripInfoCostElement,
       filters,
-      destinationsData,
+      destinations,
       extendedEventTypes,
       api);
   const statistics = new Statistics([{name: `money`}, {name: `transport`}, {name: `time`}], events);
@@ -77,4 +85,4 @@ api.getOffers().then((offersData)=> {
   render(tripControlsElement, filters.getElement());
   render(tripEventsElement.parentNode, statistics.getElement());
   tripController.init();
-})));
+});

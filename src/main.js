@@ -14,14 +14,42 @@ const tripInfo = document.querySelector(`.trip-main__trip-info`);
 
 const api = new Api({endPoint: `https://htmlacademy-es-9.appspot.com/big-trip`, authorization: `Basic test84848`});
 
-api.getOffers().then((offersData)=> {
-  eventTypes.map((type) => {
-    const typeOffers = offersData.find((offer) => {
+// тут не очень понятно, что происходит с then
+// фишка в том, что если возвращать из коллбека в then снова Promise, то можно сделать снова then потом:
+
+// но если сделать так, то возникнет проблема, что не будет доступа к destinationsData и events
+// .then(() => api.getDestinations())
+// .then((destinationsData) => api.getEvents())
+// .then((events) => {
+//   ..destinationsData..
+//   ..events..
+// })
+
+// тогда можно сделать вложенный then (он выполнится перед пепедачей дальше и в нем можно объединить данные):
+// .then(() => api.getDestinations())
+// .then((destinationsData) => api.getEvents().then((events) => ({destinationsData, events})))
+// .then(({destinationsData, events}) => {
+
+// еще хороший вариант для параллельных запросов использовать Promise.all:
+Promise.all([
+  api.getOffers(),
+  api.getDestinations(),
+  api.getEvents()
+]).then(([offers, destinations, events]) => {
+
+  // опять же - не понятно зачем здесь map, скорее всего можно просто forEach
+  eventTypes.forEach((type) => {
+    const typeOffers = offers.find((offer) => {
       return offer.type === type.title;
     });
-    type.offers = [...typeOffers.offers];
+    // здесь не надо туда-сюда в цикл гонять)
+    type.offers = typeOffers.offers;
   });
-}).then(() => api.getDestinations().then((destinationsData) => api.getEvents().then((events) => {
+
+  // тут в общем все надо разносить по функциям, то что в then происходит, может еще что-то
+  // отдельно создание списка евентов и статистики, клик на меню (его в идеале вообще в отдельный)
+  // я бы еще вынес в переменные выше элементы полученные через querySelector, если это какие-то контейнеры базовые, не изменяющиеся
+
   render(tripInfo, new TripInfo(events).getElement(), Position.AFTERBEGIN);
   const tripInfoCostElement = document.querySelector(`.trip-info__cost`);
   const tripEventsElement = document.querySelector(`.trip-events`);
@@ -30,7 +58,7 @@ api.getOffers().then((offersData)=> {
       tripEventsElement,
       tripInfoCostElement.querySelector(`.trip-info__cost-value`),
       filters,
-      destinationsData,
+      destinations,
       api);
   const statistics = new Statistics([{name: `money`}, {name: `transport`}, {name: `time`}], events);
   statistics.hide();
@@ -74,4 +102,4 @@ api.getOffers().then((offersData)=> {
   render(tripControlsElement, filters.getElement());
   render(tripEventsElement.parentNode, statistics.getElement());
   tripController.init();
-})));
+});

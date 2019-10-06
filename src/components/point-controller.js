@@ -1,18 +1,19 @@
 import {render, unrender, Position, toKebab} from '../utils';
 import {Event} from './trip-event';
 import {EventEdit} from './trip-event-edit-form';
-import {eventTypes} from '../data';
 import moment from 'moment';
+import DOMpurify from 'dompurify';
 
 export class PointController {
-  constructor(event, container, onDataChange, onChangeView, onCancel, isNew, destinations) {
+  constructor(event, container, onDataChange, onChangeView, onCancel, isNew, destinations, eventTypes) {
     this._event = event;
     this._container = container;
     this._onDataChange = onDataChange;
     this._onChangeView = onChangeView;
     this._eventComponent = new Event(event);
     this._destinations = destinations;
-    this._eventEditComponent = new EventEdit(event, destinations);
+    this._eventTypes = eventTypes;
+    this._eventEditComponent = new EventEdit(event, destinations, eventTypes);
     this._onCancel = onCancel;
     this.init(isNew);
   }
@@ -32,21 +33,22 @@ export class PointController {
   }
 
   _readFormData(formData) {
-    const selectedEventType = eventTypes.find(({title}) => title === formData.get(`event-type`));
+    const selectedEventType = this._eventTypes.find(({title}) => title === DOMpurify.sanitize(formData.get(`event-type`)));
     const type = selectedEventType ? selectedEventType : this._event.type;
-    const destination = this._destinations.find(({name}) => name === formData.get(`event-destination`));
+    const destination = this._destinations.find(({name}) => name === DOMpurify.sanitize(formData.get(`event-destination`)));
 
-    const offers = Array.from(new Set([...this._event.offers, ...type.offers])).reduce((res, offer) => {
-      const accepted = formData.get(`event-offer-${toKebab(offer.title)}`) === `on`;
-      offer.accepted = accepted;
-      if (!res.find((off) => off.title === offer.title)) {
-        return [...res, offer];
-      } else {
+    const offers = Array.from(new Set([...this._event.offers, ...type.offers]))
+      .reduce((res, offer) => {
+        const accepted = formData.get(`event-offer-${toKebab(offer.title)}`) === `on`;
+        offer.accepted = accepted;
+        if (!res.find((off) => off.title === offer.title)) {
+          return [...res, offer];
+        }
         return [...res];
-      }
-    }, []);
+      }, []);
+
     const event = {
-      id: this._event._id,
+      id: this._event.id,
       type,
       destination: destination ? destination : {name: formData.get(`event-destination`), description: ``, photo: []},
       timeStart: moment(formData.get(`event-start-time`), `DD.MM.YY HH:mm`),
@@ -59,20 +61,44 @@ export class PointController {
   }
 
   init(isNew) {
+
+    // по-хорошему надо переносить работу с evt, querySelector, add/removeEventListener в компонтенты,
+    // а в контроллерах оставлять только логику типа _activateView
+    // но это доп критерий, а отнять может много времени, поэтому в самую последнюю очередь есть смысл делать
     const onEscKeyDown = (evt) => {
       if (evt.key === `Escape` || evt.key === `Esc`) {
         this._activateView();
         document.removeEventListener(`keydown`, onEscKeyDown);
       }
     };
-    this._eventComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, () => {
-      this._activateEdit(); document.addEventListener(`keydown`, onEscKeyDown);
+
+    // стоит записывать элементы в переменные, чтобы было понятнее
+    const rollupBtn = this._eventComponent.getElement().querySelector(`.event__rollup-btn`);
+
+    rollupBtn.addEventListener(`click`, () => {
+      this._activateEdit();
+      document.addEventListener(`keydown`, onEscKeyDown);
     });
-    this._eventEditComponent.getElement().querySelector(`.event--edit`).addEventListener(`submit`, (evt) => {
+
+    // основная рекомендация - это разносить сильнее код на функции и переменные,
+    // чтобы не приходилось читать какой-то системный внутренний код, а читать названия
+
+    // а по поводу выноса логики из Контроллеров - это вообще самый верхний уровень приложения
+    // тут только какая-то базовая и управляющая логика приложения должна быть
+    // а получается, что сейчас здесь все приложение сосредоточено
+    // так что тут хотя бы работу с DOM стоит выносить в компоненты
+    // а при дальнейшем разделении можно пробовать выносить какую-то логику в отдельные модули с какой-то логикой
+    // но это такая общая рекомендация на будущее, потому что на это времени много уйдет и сейчас смысла этого делать нет
+
+    const eventEditForm = this._eventEditComponent.getElement().querySelector(`.event--edit`);
+
+    eventEditForm.addEventListener(`submit`, (evt) => {
       evt.preventDefault();
-      const formData = new FormData(this._eventEditComponent.getElement().querySelector(`.event--edit`));
+      // дублирование переменных и селекторов
+      const formData = new FormData(eventEditForm);
       const event = this._readFormData(formData);
       this._eventEditComponent.lock(`save`);
+
       this._onDataChange(isNew ? null : this._event, event)
       .then(() => {
         this._activateView();

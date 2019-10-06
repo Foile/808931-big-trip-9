@@ -2,15 +2,19 @@ import {EventList, EmptyEventList} from '../components/trip-event-list';
 import {TripDay} from '../components/trip-day';
 import {render, unrender, calcPrice, Position} from '../utils';
 import {TripDayList} from '../components/trip-day-list';
+import {TripInfo} from '../components/trip-info';
 import {Sort} from '../components/sort';
 import {PointController} from './point-controller';
 import {getFilters} from '../data';
 
 
 export class TripController {
-  constructor(events, container, totalPriceElement, filters, destinations, eventTypes, api) {
+  constructor(events, container, tripInfo, totalPriceElement, filters, destinations, eventTypes, api) {
     this._events = events;
     this._container = container;
+    this._infoContainer = tripInfo;
+    this._tripInfo = new TripInfo(events);
+    render(tripInfo, this._tripInfo.getElement(), Position.AFTERBEGIN);
     this._sort = new Sort();
     this._days = new TripDayList();
     this._views = [];
@@ -128,6 +132,10 @@ export class TripController {
         this._sort.getElement().querySelector(`.trip-sort__item--day`).innerHTML = `Day`;
         break;
     }
+
+    unrender(this._tripInfo);
+    this._tripInfo = new TripInfo(this._events);
+    render(this._infoContainer, this._tripInfo.getElement(), Position.AFTERBEGIN);
   }
 
   _updateEvents(oldData, newData) {

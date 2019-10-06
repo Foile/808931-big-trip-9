@@ -6,7 +6,7 @@ const MAX_CITY_SHOW = 3;
 export class TripInfo extends AbstractComponent {
   constructor(trip) {
     super();
-    this._trip = trip;
+    this._trip = trip.sort(({timeStart: a}, {timeStart: b})=> a - b);
   }
 
   getTemplate() {

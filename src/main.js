@@ -1,20 +1,18 @@
 import {Menu} from './components/menu';
 import {Filters} from './components/filters';
-import {TripInfo} from './components/trip-info';
 import {getFilters, eventTypes} from './data';
-import {render, Position} from './utils';
+import {render} from './utils';
 import {TripController} from './controllers/trip-controller';
 import {Statistics} from './components/statistics';
 import {Api} from './api';
 
+const tripInfo = document.querySelector(`.trip-main__trip-info`);
 const tripInfoElement = document.querySelector(`.trip-main__trip-controls`);
 const tripInfoCostElement = document.querySelector(`.trip-info__cost`).querySelector(`.trip-info__cost-value`);
+const api = new Api({endPoint: `https://htmlacademy-es-9.appspot.com/big-trip`, authorization: `Basic test84848`});
 
 const menu = new Menu([{name: `table`, link: `#`, active: true}, {name: `stats`, link: `#`}]);
 render(tripInfoElement, menu.getElement());
-const tripInfo = document.querySelector(`.trip-main__trip-info`);
-
-const api = new Api({endPoint: `https://htmlacademy-es-9.appspot.com/big-trip`, authorization: `Basic test84848`});
 
 const extendEventTypes = (offersData)=> {
   const types = eventTypes;
@@ -33,11 +31,11 @@ Promise.all([
   api.getEvents()
 ]).then(([offers, destinations, events]) => {
   const extendedEventTypes = extendEventTypes(offers);
-  render(tripInfo, new TripInfo(events).getElement(), Position.AFTERBEGIN);
   const tripEventsElement = document.querySelector(`.trip-events`);
   const filters = new Filters(getFilters());
   const tripController = new TripController(events,
       tripEventsElement,
+      tripInfo,
       tripInfoCostElement,
       filters,
       destinations,

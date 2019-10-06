@@ -48,6 +48,7 @@ export const calcDuration = (timeStart, timeEnd) => {
 
 export const calcPrice = (events) => {
   let totalAmount = 0;
+  // тут тоже forEach, а лучше вообще reduce
   events.map(((event) => {
     totalAmount += event ? Number(event.price) : 0;
     event.offers.map((offer) => {

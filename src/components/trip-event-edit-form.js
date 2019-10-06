@@ -148,18 +148,40 @@ export class EventEdit extends Event {
   }
 
   lock(action) {
+
     this._removeRedFrame();
-    this._element.querySelector(`.event__save-btn`).innerHTML = action === `save` ? `Saving...` : `Save`;
-    this._element.querySelector(`.event__reset-btn`).innerHTML = action === `delete` ? `Deleting...` : `Delete`;
-    this._element.querySelector(`.event__save-btn`).disabled = true;
-    this._element.querySelector(`.event__reset-btn`).disabled = true;
+
+    // много дублирования, можно сделать как-то так:
+
+    const saveBtn = this._element.querySelector(`.event__save-btn`);
+    const resetBtn = this._element.querySelector(`.event__reset-btn`);
+
+    saveBtn.innerHTML = action === `save` ? `Saving...` : `Save`;
+    resetBtn.innerHTML = action === `delete` ? `Deleting...` : `Delete`;
+
+    saveBtn.disabled = true;
+    resetBtn.disabled = true;
+  }
+
+  // или даже так:
+
+  get saveButton() {
+    return this._element.querySelector(`.event__save-btn`);
+  }
+
+  get resetButton() {
+    return this._element.querySelector(`.event__reset-btn`);
   }
 
   unlock() {
-    this._element.querySelector(`.event__save-btn`).disabled = false;
-    this._element.querySelector(`.event__reset-btn`).disabled = false;
-    this._element.querySelector(`.event__save-btn`).innerHTML = `Save`;
-    this._element.querySelector(`.event__reset-btn`).innerHTML = `Delete`;
+    this.saveButton.disabled = false;
+    this.resetButton.disabled = false;
+
+    this.saveButton.innerHTML = `Save`;
+    this.resetButton.innerHTML = `Delete`;
+
+    // еще, как вариант, чтобы не вызывать много querySeelctor-ов, можно при первой отрисовке (getElement)
+    // инициализировать набор этих переменных
   }
 
   _removeRedFrame() {
@@ -171,39 +193,50 @@ export class EventEdit extends Event {
     this._element.style.borderRadius = `18px`;
   }
 
+  // тут вот тоже много селекторов, точно надо убирать дублирование, например .event__photos-tape
+  // но можно и в переменные вынести - хотя бы не будет кучи текста
   resetForm() {
     this.getElement().querySelector(`.event--edit`).reset();
     this.getElement().querySelector(`.event__type-icon`).src = `img/icons/${this._type.title}.png`;
     this.getElement().querySelector(`.event__type-output`).textContent = `${makeFirstSymUp(this._type.title)} ${this._type.type === `activity` ? `in` : `to`}`;
     this.getElement().querySelector(`.event__destination-description`).textContent = `${this._destination.description}`;
     this.getElement().querySelector(`.event__photos-tape`).innerHTML = ``;
-    this.getElement().querySelector(`.event__photos-tape`).insertAdjacentHTML(`beforeend`,
-        `${this._destination.pictures.map(
-            ({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`
-        ).join(``)}`);
+
+    // лучше выносить в переменные, и кавычки то зачем снаружи
+    const imgsHTML = this._destination.pictures.map(({src, description}) => (
+      `<img class="event__photo" src="${src}" alt="${description}">`
+    )).join(``);
+
+    this.getElement().querySelector(`.event__photos-tape`).insertAdjacentHTML(`beforeend`, imgsHTML);
+
     this.getElement().querySelector(`.event__favorite-checkbox`).checked = this._isFavorite;
     this.getElement().querySelector(`.event__input[name='event-start-time']`).value = moment(this._timeStart).format(`DD-MM-YY hh:mm`);
     this.getElement().querySelector(`.event__input[name='event-end-time']`).value = moment(this._timeEnd).format(`DD-MM-YY hh:mm`);
     const offersClasses = this.getElement().querySelector(`.event__section--offers`).classList;
+
     if (this._offers.length > 0) {
       this.getElement().querySelector(`.event__section--offers`).classList.remove(`visually-hidden`);
       this.getElement().querySelector(`.event__available-offers`).innerHTML = ``;
       this.getElement().querySelector(`.event__available-offers`).insertAdjacentHTML(`beforeend`,
-          `${this._offers.map(({title, price: offerPrice, accepted}) => `<div class="event__offer-selector">
+          this._offers.map(({title, price: offerPrice, accepted}) => `<div class="event__offer-selector">
           <input class="event__offer-checkbox  visually-hidden" id="event-offer-${toKebab(title)}-1"
           type="checkbox" name="event-offer-${toKebab(title)}" ${accepted && `checked=""`}>
           <label class="event__offer-label" for="event-offer-${toKebab(title)}-1">
             <span class="event__offer-title">${title}</span>+
             €&nbsp;<span class="event__offer-price">${offerPrice}</span>
           </label>
-          </div>`).join(``)}`);
+          </div>`).join(``));
     } else if (!offersClasses.contains(`visually-hidden`)) {
       offersClasses.add(`visually-hidden`);
     }
   }
 
   _setCurrentTypeChecked() {
-    Array.from(this.getElement().querySelectorAll(`input[name="event-type"]`)).find(({title}) => title === this._type.title).checked = true;
+    const types = Array.from(this.getElement().querySelectorAll(`input[name="event-type"]`));
+
+    const selected = types.find(({title}) => title === this._type.title);
+
+    selected.checked = true;
   }
 
   _changeOffersByType() {
@@ -214,6 +247,7 @@ export class EventEdit extends Event {
           const target = evt.currentTarget;
           const typeData = eventTypes.find(({title}) => title === target.value);
           this._offers = typeData.offers;
+          // .event__section--offers - дублируется здесь и в resetForm, так что можно вынести в getter, остальное тоже наверное
           if (typeData.offers.length === 0) {
             this.getElement().querySelector(`.event__section--offers`).classList.add(`visually-hidden`);
           } else {
@@ -224,6 +258,8 @@ export class EventEdit extends Event {
           this.getElement().querySelector(`.event__type-toggle`).checked = false;
 
           this.getElement().querySelector(`.event__available-offers`).innerHTML = ``;
+
+          // этот html тоже дублируется - значит можно вынести в функцию и передавать нужные аргументы
           this.getElement().querySelector(`.event__available-offers`).insertAdjacentHTML(`beforeend`,
               `${typeData.offers.map(({title, price: offerPrice}) => `<div class="event__offer-selector">
               <input class="event__offer-checkbox  visually-hidden" id="event-offer-${toKebab(title)}-1"
@@ -244,6 +280,7 @@ export class EventEdit extends Event {
         const target = evt.currentTarget;
         const cityData = this._destinations.find(({name}) => name === target.value);
         this.getElement().querySelector(`.event__destination-description`).textContent = cityData ? cityData.description : `no description`;
+        // тоже переменные и querySelector
         this.getElement().querySelector(`.event__photos-tape`).innerHTML = ``;
         this.getElement().querySelector(`.event__photos-tape`).insertAdjacentHTML(`beforeend`, cityData ?
           `${cityData.pictures.map(({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`).join(``)}`

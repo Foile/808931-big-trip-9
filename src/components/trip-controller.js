@@ -54,13 +54,25 @@ export class TripController {
     this._totalPriceElement.textContent = calcPrice(this._events);
   }
 
+  // с такими функциями я бы наверное советовал разбить код внутри на мелкие подфункции:
   _renderSortedEvents(sorting) {
+
+    // unrenderDays (причем работа с innerHTML вообще должна быть в компоненте)
+    // либо здесь должно быть просто удаление элемента из DOM
+    // дальше он пересоздается же через new TripDayList
     this._days.getElement().innerHTML = ``;
+
+    // не очень понятно, зачем создавать переменную tripDays, если сразу можно использовать this._days
+    // renderTripDaysList
     const tripDays = this._events.length > 0 ? new TripDayList() : new EmptyEventList();
     render(this._container, tripDays.getElement());
+
+    // renderTripDays
     this._days = tripDays;
     const tripDay = new TripDay();
     render(tripDays.getElement(), tripDay.getElement());
+
+    // renderEvents
     this._eventContainer = new EventList();
     render(tripDay.getElement(), this._eventContainer.getElement());
     this._renderEvents(this._eventContainer, this._events.slice().sort(sorting));
@@ -127,31 +139,60 @@ export class TripController {
         break;
     }
   }
-  _onDataChange(oldData, newData) {
+
+  // тут можно попробовать отрефакторить, вынести в функцию updateEvents:
+  // еще немного смущают условия, как-то странно выглядят проверки на null
+  // с проверками на if (newData) и if (oldData) было бы понятнее как-то
+
+  updateEvents(oldData, newData) {
+
+    if (newData && !oldData) {
+      return this.deleteEvent(oldData.id);
+    }
+
+    if (oldData && !newData) {
+      return this.addEvent(newData);
+    }
+
+    return this.updateEvent(oldData, newData);
+  }
+
+  deleteEvent(id, oldData) {
+
     const index = this._events.findIndex((event) => event === oldData);
-    if (newData === null) {
-      return this._api.deleteEvent(oldData.id)
+
+    return this._api.deleteEvent(id)
       .then(() => {
         this._events = [...this._events.slice(0, index), ...this._events.slice(index + 1)];
-      }).then(()=>{
-        this.update();
       });
-    } else if (oldData === null) {
-      this._addEventController = null;
-      return this._api.createEvent(newData)
-      .then((event) => {
-        this._events = [event, ...this._events];
-      }).then(()=>{
-        this.update();
-      });
-    } else {
-      return this._api.updateEvent(oldData.id, newData)
+  }
+
+  addEvent(newData) {
+
+    this._addEventController = null;
+
+    return this._api.createEvent(newData)
+        .then((event) => {
+          this._events = [event, ...this._events];
+        });
+  }
+
+  updateEvent(oldData, newData) {
+
+    const index = this._events.findIndex((event) => event === oldData);
+
+    return this._api.updateEvent(oldData.id, newData)
       .then((event) => {
         this._events[index] = event;
-      }).then(()=>{
+      });
+  }
+
+  _onDataChange(oldData, newData) {
+
+    this.updateEvents(oldData, newData)
+      .then(()=>{
         this.update();
       });
-    }
   }
 
   _onChangeView() {
@@ -160,6 +201,7 @@ export class TripController {
 
   _onCancel() {
     this._addEventController = null;
+    // такой функции здесь нет
     unrender(this._addEventContainer);
   }
 

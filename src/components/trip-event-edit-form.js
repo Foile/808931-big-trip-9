@@ -317,7 +317,6 @@ export default class EventEdit extends Event {
         typeItem.addEventListener(`click`, (evt) => {
           const target = evt.currentTarget;
           const typeData = this._eventTypes.find(({title}) => title === target.value);
-          // this._offers = typeData.offers;
           if (typeData.offers.length === 0) {
             this._offersSection.classList.add(`visually-hidden`);
           } else {

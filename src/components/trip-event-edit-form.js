@@ -48,76 +48,94 @@ export default class EventEdit extends Event {
     this._eventTypeToggle = this._element.querySelector(`.event__type-toggle`);
   }
 
-  _removeRedFrame() {
-    this._element.style.border = `none`;
+
+  shake() {
+    const ANIMATION_TIMEOUT = 600;
+    this._element.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this._element.style.animation = ``;
+    }, ANIMATION_TIMEOUT);
+    this._addRedFrame();
   }
 
-  _addRedFrame() {
-    this._element.style.border = `1px dotted red`;
-    this._element.style.borderRadius = `18px`;
+  get destinationInput() {
+    return this._element.querySelector(`.event__input--destination`);
   }
 
-  _setCurrentTypeChecked() {
-    const types = Array.from(this.eventTypeInput);
-    const selected = types.find(({title}) => title === this._type.title);
-    selected.checked = true;
+  get startTimeInput() {
+    return this._element.querySelector(`.event__input[name='event-start-time']`);
   }
 
-  _changeOffersByType() {
-    this.eventTypeInput
-      .forEach((typeItem) => {
-        typeItem.addEventListener(`click`, (evt) => {
-          const target = evt.currentTarget;
-          const typeData = this._eventTypes.find(({title}) => title === target.value);
-          // this._offers = typeData.offers;
-          if (typeData.offers.length === 0) {
-            this._offersSection.classList.add(`visually-hidden`);
-          } else {
-            this._offersSection.classList.remove(`visually-hidden`);
-          }
-          this._typeIcon.src = `img/icons/${typeData.title}.png`;
-          this._eventTypeOutput.textContent = `${makeFirstSymUp(typeData.title)} ${typeData.type === `activity` ? `in` : `to`}`;
-          this._eventTypeToggle.checked = false;
-
-          this._availableOffers.innerHTML = ``;
-          this._availableOffers.insertAdjacentHTML(`beforeend`,
-              typeData.offers.map(({title, price: offerPrice}) => `<div class="event__offer-selector">
-              <input
-                class="event__offer-checkbox visually-hidden"
-                id="event-offer-${toKebab(title)}-1"
-                type="checkbox"
-                name="event-offer-${toKebab(title)}">
-              <label
-                class="event__offer-label"
-                for="event-offer-${toKebab(title)}-1">
-                  <span class="event__offer-title">${title}</span>+
-                  €&nbsp;<span class="event__offer-price">${offerPrice}</span>
-              </label>
-              </div>`).join(``));
-        });
-      });
+  get endTimeInput() {
+    return this._element.querySelector(`.event__input[name='event-end-time']`);
   }
 
-  _changeDescByCity() {
-    this.destinationInput
-      .addEventListener(`change`, (evt) => {
-        const target = evt.currentTarget;
-        const cityData = this._destinations.find(({name}) => name === target.value);
-        if (!cityData) {
-          this._destinationSection.classList.add(`visually-hidden`);
-        } else {
-          this._destinationSection.classList.remove(`visually-hidden`);
-          this._destinationDescription.textContent = cityData.description;
-          this._eventPhotosTape.innerHTML = ``;
-          this._eventPhotosTape.insertAdjacentHTML(`beforeend`, cityData ?
-            cityData.pictures.map(({src, description}) => `<img
-              class="event__photo"
-              src="${src}"
-              alt="${description}">`)
-              .join(``)
-            : ``);
-        }
-      });
+  get favoriteCheckbox() {
+    return this._element.querySelector(`.event__favorite-checkbox`);
+  }
+
+  get eventTypeInput() {
+    if (!this._eventTypeInput) {
+      this._eventTypeInput = this.getElement().querySelectorAll(`input[name="event-type"]`);
+    }
+    return this._eventTypeInput;
+  }
+
+  lock(action) {
+    this._removeRedFrame();
+    this._saveButton.innerHTML = action === `save` ? `Saving...` : `Save`;
+    this._resetButton.innerHTML = action === `delete` ? `Deleting...` : `Delete`;
+    this._saveButton.disabled = true;
+    this._resetButton.disabled = true;
+  }
+
+  unlock() {
+    this._saveButton.disabled = false;
+    this._resetButton.disabled = false;
+    this._saveButton.innerHTML = `Save`;
+    this._resetButton.innerHTML = `Delete`;
+  }
+
+  resetForm() {
+    this._editForm.reset();
+    this._typeIcon.src = `img/icons/${this._type.title}.png`;
+    this._eventTypeOutput.textContent = `${makeFirstSymUp(this._type.title)} ${this._type.type === `activity` ? `in` : `to`}`;
+    if (this._destination) {
+      this._destinationSection.classList.remove(`visually-hidden`);
+      this._destinationDescription.textContent = `${this._destination.description}`;
+      this._eventPhotosTape.innerHTML = ``;
+      this._eventPhotosTape.insertAdjacentHTML(`beforeend`,
+          `${this._destination.pictures.map(
+              ({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`
+          ).join(``)}`);
+    }
+    this.favoriteCheckbox.checked = this._isFavorite;
+    this.startTimeInput.value = moment(this._timeStart).format(`DD.MM.YY hh:mm`);
+    this.endTimeInput.value = moment(this._timeEnd).format(`DD.MM.YY hh:mm`);
+    const offersClasses = this._offersSection.classList;
+    if (this._offers.length > 0) {
+      this._offersSection.classList.remove(`visually-hidden`);
+      this._availableOffers.innerHTML = ``;
+      this._availableOffers.insertAdjacentHTML(`beforeend`,
+          this._offers.map(({title, price: offerPrice, accepted}) => `<div class="event__offer-selector">
+          <input
+            class="event__offer-checkbox visually-hidden"
+            id="event-offer-${toKebab(title)}-1"
+            type="checkbox" name="event-offer-${toKebab(title)}" ${accepted && `checked=""`}>
+          <label class="event__offer-label" for="event-offer-${toKebab(title)}-1">
+            <span class="event__offer-title">${title}</span>+
+            €&nbsp;<span class="event__offer-price">${offerPrice}</span>
+          </label>
+          </div>`).join(``));
+    } else if (!offersClasses.contains(`visually-hidden`)) {
+      offersClasses.add(`visually-hidden`);
+    }
+  }
+
+  removeElement() {
+    removeFlatpickr(this._element);
+    this._element = null;
   }
 
   getTemplate() {
@@ -278,93 +296,76 @@ export default class EventEdit extends Event {
     </li>`;
   }
 
-  shake() {
-    const ANIMATION_TIMEOUT = 600;
-    this._element.style.animation = `shake ${ANIMATION_TIMEOUT / 1000}s`;
-
-    setTimeout(() => {
-      this._element.style.animation = ``;
-    }, ANIMATION_TIMEOUT);
-    this._addRedFrame();
+  _removeRedFrame() {
+    this._element.style.border = `none`;
   }
 
-  get destinationInput() {
-    return this._element.querySelector(`.event__input--destination`);
+  _addRedFrame() {
+    this._element.style.border = `1px dotted red`;
+    this._element.style.borderRadius = `18px`;
   }
 
-  get startTimeInput() {
-    return this._element.querySelector(`.event__input[name='event-start-time']`);
+  _setCurrentTypeChecked() {
+    const types = Array.from(this.eventTypeInput);
+    const selected = types.find(({title}) => title === this._type.title);
+    selected.checked = true;
   }
 
-  get endTimeInput() {
-    return this._element.querySelector(`.event__input[name='event-end-time']`);
+  _changeOffersByType() {
+    this.eventTypeInput
+      .forEach((typeItem) => {
+        typeItem.addEventListener(`click`, (evt) => {
+          const target = evt.currentTarget;
+          const typeData = this._eventTypes.find(({title}) => title === target.value);
+          // this._offers = typeData.offers;
+          if (typeData.offers.length === 0) {
+            this._offersSection.classList.add(`visually-hidden`);
+          } else {
+            this._offersSection.classList.remove(`visually-hidden`);
+          }
+          this._typeIcon.src = `img/icons/${typeData.title}.png`;
+          this._eventTypeOutput.textContent = `${makeFirstSymUp(typeData.title)} ${typeData.type === `activity` ? `in` : `to`}`;
+          this._eventTypeToggle.checked = false;
+
+          this._availableOffers.innerHTML = ``;
+          this._availableOffers.insertAdjacentHTML(`beforeend`,
+              typeData.offers.map(({title, price: offerPrice}) => `<div class="event__offer-selector">
+              <input
+                class="event__offer-checkbox visually-hidden"
+                id="event-offer-${toKebab(title)}-1"
+                type="checkbox"
+                name="event-offer-${toKebab(title)}">
+              <label
+                class="event__offer-label"
+                for="event-offer-${toKebab(title)}-1">
+                  <span class="event__offer-title">${title}</span>+
+                  €&nbsp;<span class="event__offer-price">${offerPrice}</span>
+              </label>
+              </div>`).join(``));
+        });
+      });
   }
 
-  get favoriteCheckbox() {
-    return this._element.querySelector(`.event__favorite-checkbox`);
-  }
-
-  get eventTypeInput() {
-    if (!this._eventTypeInput) {
-      this._eventTypeInput = this.getElement().querySelectorAll(`input[name="event-type"]`);
-    }
-    return this._eventTypeInput;
-  }
-
-  lock(action) {
-    this._removeRedFrame();
-    this._saveButton.innerHTML = action === `save` ? `Saving...` : `Save`;
-    this._resetButton.innerHTML = action === `delete` ? `Deleting...` : `Delete`;
-    this._saveButton.disabled = true;
-    this._resetButton.disabled = true;
-  }
-
-  unlock() {
-    this._saveButton.disabled = false;
-    this._resetButton.disabled = false;
-    this._saveButton.innerHTML = `Save`;
-    this._resetButton.innerHTML = `Delete`;
-  }
-
-  resetForm() {
-    this._editForm.reset();
-    this._typeIcon.src = `img/icons/${this._type.title}.png`;
-    this._eventTypeOutput.textContent = `${makeFirstSymUp(this._type.title)} ${this._type.type === `activity` ? `in` : `to`}`;
-    if (this._destination) {
-      this._destinationSection.classList.remove(`visually-hidden`);
-      this._destinationDescription.textContent = `${this._destination.description}`;
-      this._eventPhotosTape.innerHTML = ``;
-      this._eventPhotosTape.insertAdjacentHTML(`beforeend`,
-          `${this._destination.pictures.map(
-              ({src, description}) => `<img class="event__photo" src="${src}" alt="${description}">`
-          ).join(``)}`);
-    }
-    this.favoriteCheckbox.checked = this._isFavorite;
-    this.startTimeInput.value = moment(this._timeStart).format(`DD.MM.YY hh:mm`);
-    this.endTimeInput.value = moment(this._timeEnd).format(`DD.MM.YY hh:mm`);
-    const offersClasses = this._offersSection.classList;
-    if (this._offers.length > 0) {
-      this._offersSection.classList.remove(`visually-hidden`);
-      this._availableOffers.innerHTML = ``;
-      this._availableOffers.insertAdjacentHTML(`beforeend`,
-          this._offers.map(({title, price: offerPrice, accepted}) => `<div class="event__offer-selector">
-          <input
-            class="event__offer-checkbox visually-hidden"
-            id="event-offer-${toKebab(title)}-1"
-            type="checkbox" name="event-offer-${toKebab(title)}" ${accepted && `checked=""`}>
-          <label class="event__offer-label" for="event-offer-${toKebab(title)}-1">
-            <span class="event__offer-title">${title}</span>+
-            €&nbsp;<span class="event__offer-price">${offerPrice}</span>
-          </label>
-          </div>`).join(``));
-    } else if (!offersClasses.contains(`visually-hidden`)) {
-      offersClasses.add(`visually-hidden`);
-    }
-  }
-
-  removeElement() {
-    removeFlatpickr(this._element);
-    this._element = null;
+  _changeDescByCity() {
+    this.destinationInput
+      .addEventListener(`change`, (evt) => {
+        const target = evt.currentTarget;
+        const cityData = this._destinations.find(({name}) => name === target.value);
+        if (!cityData) {
+          this._destinationSection.classList.add(`visually-hidden`);
+        } else {
+          this._destinationSection.classList.remove(`visually-hidden`);
+          this._destinationDescription.textContent = cityData.description;
+          this._eventPhotosTape.innerHTML = ``;
+          this._eventPhotosTape.insertAdjacentHTML(`beforeend`, cityData ?
+            cityData.pictures.map(({src, description}) => `<img
+              class="event__photo"
+              src="${src}"
+              alt="${description}">`)
+              .join(``)
+            : ``);
+        }
+      });
   }
 
 }

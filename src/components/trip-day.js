@@ -1,6 +1,6 @@
-import {AbstractComponent} from './abstract-component';
+import AbstractComponent from './abstract-component';
 
-export class TripDay extends AbstractComponent {
+export default class TripDay extends AbstractComponent {
   constructor(date, counter) {
     super();
     this._counter = counter;

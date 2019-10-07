@@ -1,7 +1,7 @@
 import {makeFirstSymUp} from '../utils';
-import {AbstractComponent} from './abstract-component';
+import AbstractComponent from './abstract-component';
 
-export class Menu extends AbstractComponent {
+export default class Menu extends AbstractComponent {
   constructor(statistics, tripController, tabs) {
     super();
     this._tabs = tabs;
@@ -42,5 +42,9 @@ export class Menu extends AbstractComponent {
     href="${link}"
     data-switch="${name}">${makeFirstSymUp(name)}</a>`).join(``)}
   </nav>`;
+  }
+
+  updateStatistics(statistics) {
+    this._statistics = statistics;
   }
 }

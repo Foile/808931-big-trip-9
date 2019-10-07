@@ -39,7 +39,7 @@ export const getFilters = () => [
 ];
 
 export const calcFilters = (events) => {
-  let result = [];
+  const result = [];
   for (const fil of getFilters()) {
     result.push({
       title: fil.title,

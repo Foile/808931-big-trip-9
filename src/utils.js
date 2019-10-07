@@ -26,16 +26,17 @@ export const render = (container, element, place = Position.BEFOREEND) => {
 };
 
 export const unrender = (Component) => {
-  if (Component._element) {
-    Component._element.remove();
+  if (Component.getElement()) {
+    Component.getElement().remove();
     Component.removeElement();
   }
 };
+
 export const makeFirstSymUp = (string) => `${string.length > 0 ? string[0].toUpperCase() + string.slice(1) : ``}`;
 
 const getDiffDuration = (diff) => {
-  let result = {};
-  let partTime = {
+  const result = {};
+  const partTime = {
     day: 86400,
     hour: 3600,
     minute: 60
@@ -52,9 +53,8 @@ export const calcDuration = (timeStart, timeEnd) => {
 };
 
 export const calcPrice = (events) => events.reduce((res, event) => {
-  res += event ? Number(event.price) +
-  event.offers.reduce((acc, offer) => {
-    acc += offer ? Number(offer.price) : 0;
+  res += event ? Number(event.price) + event.offers.reduce((acc, offer) => {
+    acc += offer && offer.accepted ? Number(offer.price) : 0;
     return acc;
   }, 0) : 0;
   return res;

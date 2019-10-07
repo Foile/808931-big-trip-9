@@ -1,9 +1,10 @@
-import {AbstractComponent} from './abstract-component';
+import AbstractComponent from './abstract-component';
 
-export class Filters extends AbstractComponent {
-  constructor(filters) {
+export default class Filters extends AbstractComponent {
+  constructor(filters, filtersCount) {
     super();
     this._filters = filters;
+    this._filtersCount = filtersCount;
   }
   getTemplate() {
     return `<form class="trip-filters" action="#" method="get">
@@ -13,7 +14,8 @@ export class Filters extends AbstractComponent {
     class="trip-filters__filter-input visually-hidden"
     type="radio"
     name="trip-filter"
-    value="${title.toLowerCase()}" ${title === `Everything` ? `checked` : ``}>
+    value="${title.toLowerCase()}" ${title === `Everything` ? `checked` : ``}
+    ${this._filtersCount.find(({title: countTitle}) => title === countTitle).count === 0 ? `disabled` : ``}>
   <label class="trip-filters__filter-label" for="filter-${title.toLowerCase()}">${title}</label>
   </div>`).join(``)}
   <button class="visually-hidden" type="submit">Accept filter</button>

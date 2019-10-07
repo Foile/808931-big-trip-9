@@ -12,14 +12,13 @@ const Method = {
 const checkStatus = (response) => {
   if (response.status >= 200 && response.status < 300) {
     return response;
-  } else {
-    throw new Error(`${response.status}: ${response.statusText}`);
   }
+  throw new Error(`${response.status}: ${response.statusText}`);
 };
 const toJSON = (response) => {
   return response.json();
 };
-export class Api {
+export default class Api {
   constructor({endPoint, authorization}) {
     this._endPoint = endPoint;
     this._authorization = authorization;
@@ -43,21 +42,21 @@ export class Api {
       body: JSON.stringify(ModelEvent.eventForUpload(event)),
       headers: new Headers({'Content-Type': `application/json`})
     })
-        .then(toJSON)
-        .then(ModelEvent.parseEvent);
+      .then(toJSON)
+      .then(ModelEvent.parseEvent);
   }
 
   updateEvent(id, data) {
     const uploadData = ModelEvent.eventForUpload(data);
     return this
-    ._load({
-      url: `points/${id}`,
-      method: Method.PUT,
-      body: JSON.stringify(uploadData),
-      headers: new Headers({'Content-Type': `application/json`})
-    })
-    .then(toJSON)
-    .then(ModelEvent.parseEvent);
+      ._load({
+        url: `points/${id}`,
+        method: Method.PUT,
+        body: JSON.stringify(uploadData),
+        headers: new Headers({'Content-Type': `application/json`})
+      })
+      .then(toJSON)
+      .then(ModelEvent.parseEvent);
   }
 
   deleteEvent(id) {

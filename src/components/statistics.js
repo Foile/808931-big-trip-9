@@ -1,4 +1,4 @@
-import {AbstractComponent} from './abstract-component';
+import AbstractComponent from './abstract-component';
 import {Chart} from 'chart.js';
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import {createElement} from '../utils';
@@ -7,7 +7,7 @@ import {eventTypes} from '../data';
 
 const BAR_HEIGHT = 40;
 
-export class Statistics extends AbstractComponent {
+export default class Statistics extends AbstractComponent {
   constructor(statistics, events) {
     super();
     this._statistics = statistics;
@@ -50,7 +50,7 @@ export class Statistics extends AbstractComponent {
   }
 
   getTransportData(events) {
-    let obj = new Map();
+    const obj = new Map();
     events.filter(({type}) => type.type === `transfer`).forEach(({type}) => {
       const title = this.getChartTitle(type.title);
       const cnt = obj.has(title) ? obj.get(title) : 0;
@@ -60,7 +60,7 @@ export class Statistics extends AbstractComponent {
   }
 
   getMoneyData(events) {
-    let obj = new Map();
+    const obj = new Map();
     events.forEach(({type, price}) => {
       const title = this.getChartTitle(type.title);
       const prc = obj.has(title) ? obj.get(title) : 0;
@@ -70,7 +70,7 @@ export class Statistics extends AbstractComponent {
   }
 
   getTimeData(events) {
-    let obj = new Map();
+    const obj = new Map();
     events.forEach(({type, timeStart, timeEnd}) => {
       const title = this.getChartTitle(type.title);
       const time = Math.abs(moment(timeEnd).diff(moment(timeStart), `hour`));

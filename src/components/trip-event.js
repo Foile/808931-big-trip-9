@@ -1,11 +1,11 @@
 
-import {AbstractComponent} from './abstract-component';
+import AbstractComponent from './abstract-component';
 import {makeFirstSymUp, calcDuration, DATE_FORMAT, TIME_FORMAT} from '../utils';
 import moment from 'moment';
 
 const MAX_OFFERS_SHOW = 3;
 
-export class Event extends AbstractComponent {
+export default class Event extends AbstractComponent {
   constructor({id, type, destination, timeStart, timeEnd, price, offers, isFavorite}) {
     super();
     this._id = id;

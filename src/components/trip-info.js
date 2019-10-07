@@ -1,12 +1,12 @@
 
-import {AbstractComponent} from './abstract-component';
+import AbstractComponent from './abstract-component';
 
 const MAX_CITY_SHOW = 3;
 
-export class TripInfo extends AbstractComponent {
+export default class TripInfo extends AbstractComponent {
   constructor(trip) {
     super();
-    this._trip = trip.sort(({timeStart: a}, {timeStart: b})=> a - b);
+    this._trip = trip.sort(({timeStart: a}, {timeStart: b}) => a - b);
   }
 
   getTemplate() {

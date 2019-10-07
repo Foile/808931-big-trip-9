@@ -1,6 +1,6 @@
-import {AbstractComponent} from './abstract-component';
+import AbstractComponent from './abstract-component';
 
-export class Sort extends AbstractComponent {
+export default class Sort extends AbstractComponent {
   getTemplate() {
     return `<form
       class="trip-events__trip-sort trip-sort"

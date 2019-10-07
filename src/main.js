@@ -42,7 +42,6 @@ Promise.all([
       api);
 
   tripController.init();
-}).catch((err) => {
+}).catch(() => {
   unrender(replacer);
-  throw err;
 });

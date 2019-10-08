@@ -17,6 +17,7 @@ export default class Event extends AbstractComponent {
     this._offers = offers;
     this._isFavorite = isFavorite;
   }
+
   getTemplate() {
     return `<li class="trip-events__item">
   <div class="event">

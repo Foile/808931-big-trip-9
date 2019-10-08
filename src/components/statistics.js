@@ -14,65 +14,44 @@ export default class Statistics extends AbstractComponent {
     this._events = events;
     this._charts = [];
   }
-  getTemplate() {
-    return `<section class="statistics"><h2>Trip statistics</h2></section>`;
-  }
 
-  getElement() {
-    if (!this._element) {
-      const element = createElement(this.getTemplate());
-      this._statistics.forEach(({name}) => {
-        const ctx = createElement(`<canvas class="statistics__chart  statistics__chart--${name}" width="900"></canvas>`);
-        const statContainer = createElement(`<div class="statistics__item statistics__item--${name}"></div>`);
-        statContainer.appendChild(ctx);
-        element.appendChild(statContainer);
-        const stat = this.getStatistics(name, this._events);
-        ctx.height = stat.data.length * (BAR_HEIGHT + 2);
-        const chart = new Chart(ctx, this.configChart(stat, name === `time` ? `time spent` : name));
-        this._charts.push(chart);
-        this._element = element;
-      });
-    }
-    return this._element;
-  }
-
-  getStatistics(name, events) {
+  _getStatistics(name, events) {
     switch (name) {
-      case `transport`: return this.getTransportData(events);
-      case `money`: return this.getMoneyData(events);
-      case `time`: return this.getTimeData(events);
+      case `transport`: return this._getTransportData(events);
+      case `money`: return this._getMoneyData(events);
+      case `time`: return this._getTimeData(events);
       default: return null;
     }
   }
 
-  getChartTitle(title) {
+  _getChartTitle(title) {
     return `${eventTypes.find((eventType) => eventType.title === title).emoji} ${title.toUpperCase()}`;
   }
 
-  getTransportData(events) {
+  _getTransportData(events) {
     const obj = new Map();
     events.filter(({type}) => type.type === `transfer`).forEach(({type}) => {
-      const title = this.getChartTitle(type.title);
+      const title = this._getChartTitle(type.title);
       const cnt = obj.has(title) ? obj.get(title) : 0;
       obj.set(title, cnt + 1);
     });
     return {labels: [...obj.keys()], data: [...obj.values()]};
   }
 
-  getMoneyData(events) {
+  _getMoneyData(events) {
     const obj = new Map();
     events.forEach(({type, price}) => {
-      const title = this.getChartTitle(type.title);
+      const title = this._getChartTitle(type.title);
       const prc = obj.has(title) ? obj.get(title) : 0;
       obj.set(title, prc + price);
     });
     return {labels: [...obj.keys()], data: [...obj.values()]};
   }
 
-  getTimeData(events) {
+  _getTimeData(events) {
     const obj = new Map();
     events.forEach(({type, timeStart, timeEnd}) => {
-      const title = this.getChartTitle(type.title);
+      const title = this._getChartTitle(type.title);
       const time = Math.abs(moment(timeEnd).diff(moment(timeStart), `hour`));
       const cnt = obj.has(title) ? obj.get(title) : 0;
       obj.set(title, cnt + time);
@@ -81,7 +60,7 @@ export default class Statistics extends AbstractComponent {
     return {labels: [...obj.keys()], data};
   }
 
-  configChart({labels, data}, title) {
+  _configChart({labels, data}, title) {
     return {
       type: `horizontalBar`,
       plugins: [ChartDataLabels],
@@ -155,5 +134,26 @@ export default class Statistics extends AbstractComponent {
     };
   }
 
+  getTemplate() {
+    return `<section class="statistics"><h2>Trip statistics</h2></section>`;
+  }
+
+  getElement() {
+    if (!this._element) {
+      const element = createElement(this.getTemplate());
+      this._statistics.forEach(({name}) => {
+        const ctx = createElement(`<canvas class="statistics__chart  statistics__chart--${name}" width="900"></canvas>`);
+        const statContainer = createElement(`<div class="statistics__item statistics__item--${name}"></div>`);
+        statContainer.appendChild(ctx);
+        element.appendChild(statContainer);
+        const stat = this._getStatistics(name, this._events);
+        ctx.height = stat.data.length * (BAR_HEIGHT + 2);
+        const chart = new Chart(ctx, this._configChart(stat, name === `time` ? `time spent` : name));
+        this._charts.push(chart);
+        this._element = element;
+      });
+    }
+    return this._element;
+  }
 
 }

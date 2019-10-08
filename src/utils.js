@@ -32,7 +32,7 @@ export const unrender = (Component) => {
   }
 };
 
-export const makeFirstSymUp = (string) => `${string.length > 0 ? string[0].toUpperCase() + string.slice(1) : ``}`;
+export const makeFirstSymUp = (string) => `${string.length > 0 ? `${string[0].toUpperCase()}${string.slice(1)}` : ``}`;
 
 const getDiffDuration = (diff) => {
   const result = {};

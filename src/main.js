@@ -33,15 +33,16 @@ Promise.all([
   const extendedEventTypes = extendEventTypes(offers);
   const tripEventsElement = document.querySelector(`.trip-events`);
   const tripController = new TripController(events,
-      tripEventsElement,
-      tripInfo,
-      tripControlsElement,
-      tripInfoCostElement,
-      destinations,
-      extendedEventTypes,
-      api);
+    tripEventsElement,
+    tripInfo,
+    tripControlsElement,
+    tripInfoCostElement,
+    destinations,
+    extendedEventTypes,
+    api);
 
   tripController.init();
-}).catch(() => {
+}).catch((err) => {
   unrender(replacer);
+  throw err;
 });

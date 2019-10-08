@@ -18,6 +18,45 @@ export default class PointController {
     this.init(isNew);
   }
 
+  _activateView() {
+    if (this._container.getElement().contains(this._eventEditComponent.getElement())) {
+      this._container.getElement().replaceChild(this._eventComponent.getElement(), this._eventEditComponent.getElement());
+      this._eventEditComponent.resetForm();
+    }
+  }
+
+  _activateEdit() {
+    this._onChangeView();
+    if (this._container.getElement().contains(this._eventComponent.getElement())) {
+      this._container.getElement().replaceChild(this._eventEditComponent.getElement(), this._eventComponent.getElement());
+    }
+  }
+
+  _readFormData(formData) {
+    const selectedEventType = this._eventTypes.find(({title}) => title === DOMpurify.sanitize(formData.get(`event-type`)));
+    const type = selectedEventType ? selectedEventType : this._event.type;
+    const destination = this._destinations.find(({name}) => name === DOMpurify.sanitize(formData.get(`event-destination`)));
+    const offers = Array.from(new Set([...type.offers])).reduce((res, offer) => {
+      const accepted = formData.get(`event-offer-${toKebab(offer.title)}`) === `on`;
+      offer.accepted = accepted;
+      if (!res.find((off) => off.title === offer.title)) {
+        return [...res, offer];
+      }
+      return [...res];
+    }, []);
+    const event = {
+      id: this._event.id,
+      type,
+      destination: destination ? destination : {name: formData.get(`event-destination`), description: ``, photo: []},
+      timeStart: moment(formData.get(`event-start-time`), `DD.MM.YY HH:mm`),
+      timeEnd: moment(formData.get(`event-end-time`), `DD.MM.YY HH:mm`),
+      price: formData.get(`event-price`),
+      offers,
+      isFavorite: formData.get(`event-favorite`) === `on`,
+    };
+    return event;
+  }
+
   init(isNew) {
     const onEscKeyDown = (evt) => {
       if (evt.key === `Escape` || evt.key === `Esc`) {
@@ -86,45 +125,6 @@ export default class PointController {
     } else {
       render(this._container.getElement(), this._eventComponent.getElement());
     }
-  }
-
-  _activateView() {
-    if (this._container.getElement().contains(this._eventEditComponent.getElement())) {
-      this._container.getElement().replaceChild(this._eventComponent.getElement(), this._eventEditComponent.getElement());
-      this._eventEditComponent.resetForm();
-    }
-  }
-
-  _activateEdit() {
-    this._onChangeView();
-    if (this._container.getElement().contains(this._eventComponent.getElement())) {
-      this._container.getElement().replaceChild(this._eventEditComponent.getElement(), this._eventComponent.getElement());
-    }
-  }
-
-  _readFormData(formData) {
-    const selectedEventType = this._eventTypes.find(({title}) => title === DOMpurify.sanitize(formData.get(`event-type`)));
-    const type = selectedEventType ? selectedEventType : this._event.type;
-    const destination = this._destinations.find(({name}) => name === DOMpurify.sanitize(formData.get(`event-destination`)));
-    const offers = Array.from(new Set([...type.offers])).reduce((res, offer) => {
-      const accepted = formData.get(`event-offer-${toKebab(offer.title)}`) === `on`;
-      offer.accepted = accepted;
-      if (!res.find((off) => off.title === offer.title)) {
-        return [...res, offer];
-      }
-      return [...res];
-    }, []);
-    const event = {
-      id: this._event.id,
-      type,
-      destination: destination ? destination : {name: formData.get(`event-destination`), description: ``, photo: []},
-      timeStart: moment(formData.get(`event-start-time`), `DD.MM.YY HH:mm`),
-      timeEnd: moment(formData.get(`event-end-time`), `DD.MM.YY HH:mm`),
-      price: formData.get(`event-price`),
-      offers,
-      isFavorite: formData.get(`event-favorite`) === `on`,
-    };
-    return event;
   }
 
 }

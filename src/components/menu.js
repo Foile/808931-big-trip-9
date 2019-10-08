@@ -10,6 +10,20 @@ export default class Menu extends AbstractComponent {
     this.getElement().addEventListener(`click`, this._onClick.bind(this));
   }
 
+  updateStatistics(statistics) {
+    this._statistics = statistics;
+  }
+
+  getTemplate() {
+    return `<nav
+    class="trip-controls__trip-tabs trip-tabs">
+    ${this._tabs.map(({name, link, active}) => `<a
+    class="trip-tabs__btn ${active ? `trip-tabs__btn--active` : ``}"
+    href="${link}"
+    data-switch="${name}">${makeFirstSymUp(name)}</a>`).join(``)}
+  </nav>`;
+  }
+
   _onClick(evt) {
     evt.preventDefault();
     const target = evt.target;
@@ -32,19 +46,5 @@ export default class Menu extends AbstractComponent {
         this._statistics.show();
         break;
     }
-  }
-
-  getTemplate() {
-    return `<nav
-    class="trip-controls__trip-tabs trip-tabs">
-    ${this._tabs.map(({name, link, active}) => `<a
-    class="trip-tabs__btn ${active ? `trip-tabs__btn--active` : ``}"
-    href="${link}"
-    data-switch="${name}">${makeFirstSymUp(name)}</a>`).join(``)}
-  </nav>`;
-  }
-
-  updateStatistics(statistics) {
-    this._statistics = statistics;
   }
 }

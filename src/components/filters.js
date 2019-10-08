@@ -6,6 +6,7 @@ export default class Filters extends AbstractComponent {
     this._filters = filters;
     this._filtersCount = filtersCount;
   }
+
   getTemplate() {
     return `<form class="trip-filters" action="#" method="get">
   ${this._filters.map(({title}) => `<div class="trip-filters__filter">

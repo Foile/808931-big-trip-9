@@ -9,12 +9,12 @@ export class ModelEvent {
     this.timeEnd = data[`date_to`];
     this.price = Number(data[`base_price`]);
     this.isFavorite = DOMpurify.sanitize(data[`is_favorite`]);
-    this.type = this.findEventType(DOMpurify.sanitize(data[`type`]));
+    this.type = this._findEventType(DOMpurify.sanitize(data[`type`]));
     this.offers = data.offers;
   }
 
-  findEventType(type) {
-    return eventTypes.find(({title})=> title === type);
+  _findEventType(type) {
+    return eventTypes.find(({title}) => title === type);
   }
 
   static parseEvent(data) {

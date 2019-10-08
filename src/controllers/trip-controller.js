@@ -38,6 +38,72 @@ export default class TripController {
     this._views = [];
   }
 
+  _renderEvents(container, events) {
+    events.filter(this._currentFilter.callback).forEach((event) => {
+      const point = new PointController(event,
+          container,
+          this._onDataChange,
+          this._onChangeView,
+          null,
+          false,
+          this._destinations,
+          this._eventTypes);
+      this._views.push(point._activateView.bind(point));
+    });
+  }
+
+  _renderDays() {
+    unrender(this._days);
+    this._days = this._events.length > 0 ? new TripDayList() : new EmptyEventList();
+    render(this._container, this._days.getElement());
+  }
+
+  _renderSortedEvents(sorting) {
+    this._renderDays();
+    const tripDay = new TripDay();
+    render(this._days.getElement(), tripDay.getElement());
+    this._eventContainer = new EventList();
+    render(tripDay.getElement(), this._eventContainer.getElement());
+    this._renderEvents(this._eventContainer, this._events.slice().sort(sorting));
+  }
+
+  _renderDayEvents() {
+    this._renderDays();
+    const days = new Set(this._events.filter(this._currentFilter.callback).map(({timeStart}) => (new Date(timeStart)).setHours(0, 0, 0, 0)));
+    Array.from(days).forEach((day, index) => {
+      const dayElement = new TripDay(day, index + 1).getElement();
+      render(this._days.getElement(), dayElement);
+      this._eventContainer = new EventList();
+      render(dayElement, this._eventContainer.getElement());
+      const dayEvents = this._events.filter(
+          ({timeStart}) => new Date(day).toLocaleDateString() === new Date(timeStart).toLocaleDateString()
+      );
+      this._renderEvents(this._eventContainer, dayEvents);
+    });
+  }
+
+  _updateEvents(oldData, newData) {
+    const index = this._events.findIndex((event) => event === oldData);
+    if (oldData && !newData) {
+      return this._api.deleteEvent(oldData.id)
+        .then(() => {
+          this._events = [...this._events.slice(0, index), ...this._events.slice(index + 1)];
+        });
+    }
+    if (!oldData && newData) {
+      this._addEventController = null;
+      return this._api.createEvent(newData)
+        .then((event) => {
+          this._events = [event, ...this._events];
+        });
+    }
+
+    return this._api.updateEvent(oldData.id, newData)
+      .then((event) => {
+        this._events[index] = event;
+      });
+  }
+
   init() {
     this._totalPriceElement.textContent = calcPrice(this._events);
     render(this._container, this._sort.getElement());
@@ -155,50 +221,6 @@ export default class TripController {
     this.update();
   }
 
-  _renderEvents(container, events) {
-    events.filter(this._currentFilter.callback).forEach((event) => {
-      const point = new PointController(event,
-          container,
-          this._onDataChange,
-          this._onChangeView,
-          null,
-          false,
-          this._destinations,
-          this._eventTypes);
-      this._views.push(point._activateView.bind(point));
-    });
-  }
-
-  _renderDays() {
-    unrender(this._days);
-    this._days = this._events.length > 0 ? new TripDayList() : new EmptyEventList();
-    render(this._container, this._days.getElement());
-  }
-
-  _renderSortedEvents(sorting) {
-    this._renderDays();
-    const tripDay = new TripDay();
-    render(this._days.getElement(), tripDay.getElement());
-    this._eventContainer = new EventList();
-    render(tripDay.getElement(), this._eventContainer.getElement());
-    this._renderEvents(this._eventContainer, this._events.slice().sort(sorting));
-  }
-
-  _renderDayEvents() {
-    this._renderDays();
-    const days = new Set(this._events.filter(this._currentFilter.callback).map(({timeStart}) => (new Date(timeStart)).setHours(0, 0, 0, 0)));
-    Array.from(days).forEach((day, index) => {
-      const dayElement = new TripDay(day, index + 1).getElement();
-      render(this._days.getElement(), dayElement);
-      this._eventContainer = new EventList();
-      render(dayElement, this._eventContainer.getElement());
-      const dayEvents = this._events.filter(
-          ({timeStart}) => new Date(day).toLocaleDateString() === new Date(timeStart).toLocaleDateString()
-      );
-      this._renderEvents(this._eventContainer, dayEvents);
-    });
-  }
-
   _onFilterClick(evt) {
     if (evt.target.tagName[0].toLowerCase() !== `i`) {
       return;
@@ -206,7 +228,6 @@ export default class TripController {
     this._currentFilter = getFilters().find(({title}) => evt.target.value === title.toLowerCase());
     this.update();
   }
-
 
   _onDataChange(oldData, newData) {
     return this._updateEvents(oldData, newData)
@@ -225,28 +246,6 @@ export default class TripController {
   _onCancel() {
     this._addEventController = null;
     unrender(this._addEventContainer);
-  }
-
-  _updateEvents(oldData, newData) {
-    const index = this._events.findIndex((event) => event === oldData);
-    if (oldData && !newData) {
-      return this._api.deleteEvent(oldData.id)
-        .then(() => {
-          this._events = [...this._events.slice(0, index), ...this._events.slice(index + 1)];
-        });
-    }
-    if (!oldData && newData) {
-      this._addEventController = null;
-      return this._api.createEvent(newData)
-        .then((event) => {
-          this._events = [event, ...this._events];
-        });
-    }
-
-    return this._api.updateEvent(oldData.id, newData)
-      .then((event) => {
-        this._events[index] = event;
-      });
   }
 
 }

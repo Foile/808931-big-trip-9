@@ -7,10 +7,6 @@ import 'flatpickr/dist/flatpickr.min.css';
 import 'flatpickr/dist/themes/light.css';
 import {toKebab} from '../utils';
 
-const removeFlatpickr = (element) => {
-  element.flatpickr().destroy();
-};
-
 export default class EventEdit extends Event {
   constructor(event, destinations, eventTypes) {
     super(event);
